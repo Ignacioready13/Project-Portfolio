@@ -1,6 +1,8 @@
 # Original source media (large HEIC / 60MB video) — keep out of the repo.
 # The web-ready versions live in media/ and ARE tracked.
 /media - racing game/
+.claude/
+
 
 # OS junk
 .DS_Store
@@ -8,3 +10,6 @@ Thumbs.db
 
 # Local scratch / logs
 *.log
+
+ARCHITECTURE.md 
+instructions.md

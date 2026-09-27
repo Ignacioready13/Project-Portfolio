@@ -75,6 +75,50 @@ const PROJECTS = [
       { type: "image", src: "media/racing-game/wiring-closeup.jpg",  caption: "Our prototype needed a second breadboard to keep the LEDs visible." }
     ]
   },
+  {
+    tab: "Guitar restoration",
+    title: "Guitar rewiring, modding, and restoration",
+    subtitle: "Engineering projects class at CU Boulder (August – November 2025)",
+
+    summary: [
+      {
+        heading: "",
+        paragraphs: [
+          "During my senior year of high school, some family friends gave me a very broken electric guitar. The headstock was cracked clean in half. The pickguard was shattered and filthy. And it didn’t make any noise at all.",
+          "I took it apart just thinking I’d see what the circuitry of a guitar looked like; I didn’t think I had the bandwidth to actually fix it up. Upon further research, it was briefly made sometime in the 1960s by a now-defunct company, and had no documentation whatsoever. It really seemed like a lost cause. I took off the pickguard and cleaned everything up, just out of respect for and curiosity about the guitar. After spending increasingly long hours admiring its components, I figured I might as well just fix the thing." 
+        ]
+      },
+      {
+        heading: "Wiring",
+        paragraphs: [
+          "Before writing code, we made a diagram of all possible inputs to outputs.",
+          "I cleanly translated our I/O diagram into Arduino logic with an object-oriented coding approach. The Controller class defines variables which each Controller object needs to keep track of: current gear, its own full pinout, and the state of its corresponding LED. The broader Car class defines functions and variables for each player, as well as holding a reference to the corresponding Controller. The finished code was robust enough to keep track of all the necessary variables for each controller, NeoPixel strip, and servo, and carefully time the logical handling of all the inputs and outputs to create a fluid, enjoyable game experience."
+        ]
+      },
+      {
+        heading: "Pickguard",
+        paragraphs: [
+          "I laid out the wiring in such a way to minimize unnecessary jumper cables and maximize organization in the case of malfunction, completely redoing the wiring several times to make it as failsafe and clean as possible."
+        ]
+      },
+      {
+        heading: "Lighting",
+        paragraphs: [
+          "I laid out the wiring in such a way to minimize unnecessary jumper cables and maximize organization in the case of malfunction, completely redoing the wiring several times to make it as failsafe and clean as possible."
+        ]
+      }
+    ],
+
+    skills: ["Arduino", "C++", "Embedded systems"],
+
+    gallery: [
+      { type: "image", src: "media/racing-game/full-view.jpg",       caption: "The final project, seen with two controllers connected and the game ready to play. Note the two dials indicating RPM and the two NeoPixel strips (unlit in this photo) to indicate car distance along the track." },
+      { type: "image", src: "media/racing-game/prototype.jpg",       caption: "An early prototype, featuring only one controller and rudimentary dial. Notice the limit switches are glued to the top of the controller before the design was modified to accommodate the switches internally" },
+      { type: "image", src: "media/racing-game/wiring-topdown.jpg",  caption: "The final design, shown with all the wiring exposed. Notice the 4xAA pack used to power the servos separately, and the breadboard featuring two LEDs to indicate to each player when they stall their car." },
+      { type: "video", src: "media/racing-game/racing-demo.mp4",     caption: "Two playthroughs of the final game. Blue Player 'burns out' their car late in the second game (by skipping a gear)." },
+      { type: "image", src: "media/racing-game/wiring-closeup.jpg",  caption: "Our prototype needed a second breadboard to keep the LEDs visible." }
+    ]
+  },
 
   /* =====================================================================
      PLACEHOLDER PROJECT — DELETE OR REPLACE THIS WHOLE BLOCK
