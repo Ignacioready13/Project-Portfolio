@@ -75,101 +75,230 @@ const PROJECTS = [
       { type: "image", src: "media/racing-game/wiring-closeup.jpg",  caption: "Our prototype needed a second breadboard to keep the LEDs visible." }
     ]
   },
+   /* =====================================================================
+     PROJECT 2 — guitar
+     ===================================================================== */
   {
     tab: "Guitar restoration",
     title: "Guitar rewiring, modding, and restoration",
-    subtitle: "Engineering projects class at CU Boulder (August – November 2025)",
+    subtitle: "Personal project",
 
     summary: [
       {
         heading: "",
         paragraphs: [
-          "During my senior year of high school, some family friends gave me a very broken electric guitar. The headstock was cracked clean in half. The pickguard was shattered and filthy. And it didn’t make any noise at all.",
-          "I took it apart just thinking I’d see what the circuitry of a guitar looked like; I didn’t think I had the bandwidth to actually fix it up. Upon further research, it was briefly made sometime in the 1960s by a now-defunct company, and had no documentation whatsoever. It really seemed like a lost cause. I took off the pickguard and cleaned everything up, just out of respect for and curiosity about the guitar. After spending increasingly long hours admiring its components, I figured I might as well just fix the thing." 
+          "Content coming soon" 
         ]
       },
       {
         heading: "Wiring",
         paragraphs: [
-          "Before writing code, we made a diagram of all possible inputs to outputs.",
-          "I cleanly translated our I/O diagram into Arduino logic with an object-oriented coding approach. The Controller class defines variables which each Controller object needs to keep track of: current gear, its own full pinout, and the state of its corresponding LED. The broader Car class defines functions and variables for each player, as well as holding a reference to the corresponding Controller. The finished code was robust enough to keep track of all the necessary variables for each controller, NeoPixel strip, and servo, and carefully time the logical handling of all the inputs and outputs to create a fluid, enjoyable game experience."
+         
+          "Content coming soon"
         ]
       },
       {
         heading: "Pickguard",
         paragraphs: [
-          "I laid out the wiring in such a way to minimize unnecessary jumper cables and maximize organization in the case of malfunction, completely redoing the wiring several times to make it as failsafe and clean as possible."
+          "Content coming soon"
         ]
       },
       {
         heading: "Lighting",
         paragraphs: [
-          "I laid out the wiring in such a way to minimize unnecessary jumper cables and maximize organization in the case of malfunction, completely redoing the wiring several times to make it as failsafe and clean as possible."
+          "Content coming soon"
         ]
       }
     ],
 
-    skills: ["Arduino", "C++", "Embedded systems"],
+    skills: ["#"],
 
     gallery: [
-      { type: "image", src: "media/racing-game/full-view.jpg",       caption: "The final project, seen with two controllers connected and the game ready to play. Note the two dials indicating RPM and the two NeoPixel strips (unlit in this photo) to indicate car distance along the track." },
-      { type: "image", src: "media/racing-game/prototype.jpg",       caption: "An early prototype, featuring only one controller and rudimentary dial. Notice the limit switches are glued to the top of the controller before the design was modified to accommodate the switches internally" },
-      { type: "image", src: "media/racing-game/wiring-topdown.jpg",  caption: "The final design, shown with all the wiring exposed. Notice the 4xAA pack used to power the servos separately, and the breadboard featuring two LEDs to indicate to each player when they stall their car." },
-      { type: "video", src: "media/racing-game/racing-demo.mp4",     caption: "Two playthroughs of the final game. Blue Player 'burns out' their car late in the second game (by skipping a gear)." },
-      { type: "image", src: "media/racing-game/wiring-closeup.jpg",  caption: "Our prototype needed a second breadboard to keep the LEDs visible." }
+      { type: "image", src: "media/guitar/guitarBefore.png",       caption: "" },
+      { type: "image", src: "media/guitar/guitarTrace.png",       caption: "" },
+      { type: "image", src: "media/guitar/guitarElectronics.jpg",  caption: "" },
+      { type: "image", src: "media/guitar/guitarWiringClean.png",  caption: "" }
+    
     ]
   },
 
-  /* =====================================================================
-     PLACEHOLDER PROJECT — DELETE OR REPLACE THIS WHOLE BLOCK
+ /* =====================================================================
+     PROJECT 3 - SDR mount
      ===================================================================== */
   {
-    tab: "Project two",
-    title: "Placeholder project two",
-    subtitle: "Replace this subtitle with your project's context.",
+    tab: "SDR mount",
+    title: "SDR mount",
+    subtitle: "For RF lab",
+
     summary: [
       {
         heading: "",
         paragraphs: [
-          "This is a placeholder tab so you can see how multiple projects behave. Copy the structure of the first project (or this one) to add your real work, then delete the placeholders."
+          "Content coming soon" 
         ]
       },
       {
-        heading: "An example sub-header",
+        heading: "Content coming soon",
         paragraphs: [
-          "Sub-headers like this let you split a longer write-up into sections. Add as many blocks as you like."
+         
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
         ]
       }
     ],
-    skills: ["Skill A", "Skill B", "Skill C"],
+
+    skills: ["#"],
+
     gallery: [
-      { type: "image", src: "media/placeholders/placeholder-1.svg", caption: "Placeholder image one." },
-      { type: "image", src: "media/placeholders/placeholder-2.svg", caption: "Placeholder image two." }
+      { type: "image", src: "media/mount/mountCadViewOne.png", caption: "Placeholder image one." },
+      { type: "image", src: "media/mount/mountCadViewTwo.png", caption: "Placeholder image two." },
+      { type: "image", src: "media/mount/mount_2phones.jpg", caption: "Placeholder image three." }
     ]
   },
-
   /* =====================================================================
-     PLACEHOLDER PROJECT — DELETE OR REPLACE THIS WHOLE BLOCK
+     PROJECT 4 — RF Research
      ===================================================================== */
   {
-    tab: "Project three",
-    title: "Placeholder project three",
-    subtitle: "Replace this subtitle with your project's context.",
+    tab: "RF research",
+    title: "TDOA, NLLS",
+    subtitle: "For lab",
+
     summary: [
       {
         heading: "",
         paragraphs: [
-          "Another placeholder tab. Having three tabs lets you confirm the tab bar and carousel both work end-to-end before you replace them with real content."
+          "Content coming soon" 
+        ]
+      },
+      {
+        heading: "Content coming soon",
+        paragraphs: [
+         
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
         ]
       }
     ],
-    skills: ["Skill X", "Skill Y"],
+
+    skills: ["#"],
+
     gallery: [
       { type: "image", src: "media/placeholders/placeholder-1.svg", caption: "Placeholder image one." },
       { type: "image", src: "media/placeholders/placeholder-2.svg", caption: "Placeholder image two." },
       { type: "image", src: "media/placeholders/placeholder-3.svg", caption: "Placeholder image three." }
     ]
-  }
+  },
+  /* =====================================================================
+     PROJECT # - placeholder
+     ===================================================================== */
+  {
+    tab: "Video game",
+    title: "Video game made in Roblox",
+    subtitle: "",
+
+    summary: [
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon" 
+        ]
+      },
+      {
+        heading: "Content coming soon",
+        paragraphs: [
+         
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
+        ]
+      }
+    ],
+
+    skills: ["#"],
+
+    gallery: [
+      { type: "video", src: "media/roblox/new.mp4", caption: "A Roblox ViewportFrame is usually meant to render a single 3d object; it was never meant to simulate an entire 3D world. By moving the player's character but leaving their camera in front of the Viewport, and linking their actions to a clone of their player rig within the Viewport environment, I can create an effect of a pixelated, scaled-down mini-world." },
+      { type: "image", src: "media/placeholders/placeholder-2.svg", caption: "Placeholder image two." },
+      { type: "image", src: "media/placeholders/placeholder-3.svg", caption: "Placeholder image three." }
+    ]
+  },
+  /* =====================================================================
+     PROJECT # - placeholder
+     ===================================================================== */
+  {
+    tab: "Placeholder",
+    title: "",
+    subtitle: "",
+
+    summary: [
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon" 
+        ]
+      },
+      {
+        heading: "Content coming soon",
+        paragraphs: [
+         
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
+        ]
+      },
+      {
+        heading: "",
+        paragraphs: [
+          "Content coming soon"
+        ]
+      }
+    ],
+
+    skills: ["#"],
+
+    gallery: [
+      { type: "image", src: "media/placeholders/placeholder-1.svg", caption: "Placeholder image one." },
+      { type: "image", src: "media/placeholders/placeholder-2.svg", caption: "Placeholder image two." },
+      { type: "image", src: "media/placeholders/placeholder-3.svg", caption: "Placeholder image three." }
+    ]
+  },
+  
 
 ];
 
