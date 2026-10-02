@@ -2,7 +2,7 @@
 # The web-ready versions live in media/ and ARE tracked.
 /media - racing game/
 .claude/
-
+/markdown/
 
 # OS junk
 .DS_Store

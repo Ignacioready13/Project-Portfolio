@@ -12,12 +12,20 @@
   var githubBtn = document.getElementById('githubBtn');
   var panelsEl = document.getElementById('panels');
 
+  var projectText = (typeof PROJECT_TEXT !== 'undefined') ? PROJECT_TEXT : {};
+
   /* ----------------------------- helpers ----------------------------- */
   function make(tag, className, text) {
     var n = document.createElement(tag);
     if (className) n.className = className;
     if (text != null) n.textContent = text;
     return n;
+  }
+
+  function slugify(name) {
+    return String(name).trim().toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   function svgChevron(dir) {
@@ -193,14 +201,17 @@
 
       if (proj.subtitle) panel.appendChild(make('p', 'project-subtitle', proj.subtitle));
 
-      if (proj.summary && proj.summary.length) {
+      var summary = projectText[slugify(proj.tab)] || [];
+      if (summary.length) {
         var sumWrap = make('div', 'summary');
-        proj.summary.forEach(function (block) {
+        summary.forEach(function (block) {
           var b = make('div', 'summary-block');
-          if (block.heading) b.appendChild(make('h3', 'summary-heading', block.heading));
-          (block.paragraphs || []).forEach(function (p) {
-            b.appendChild(make('p', null, p));
-          });
+          if (block.heading) {
+            var h = make('h3', 'summary-heading');
+            h.innerHTML = block.heading;
+            b.appendChild(h);
+          }
+          b.insertAdjacentHTML('beforeend', (block.paragraphs || []).join(''));
           sumWrap.appendChild(b);
         });
         panel.appendChild(sumWrap);

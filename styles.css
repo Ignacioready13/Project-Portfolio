@@ -229,7 +229,37 @@ body {
   color: var(--text-soft);
 }
 
-.summary-block p:last-child { margin-bottom: 0; }
+.summary-block > :last-child { margin-bottom: 0; }
+
+.summary-block ul,
+.summary-block ol {
+  margin: 0 0 10px;
+  padding-left: 1.35em;
+  color: var(--text-soft);
+}
+
+.summary-block li {
+  margin-bottom: 3px;
+}
+
+.summary-block code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: #eef1f5;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05em 0.35em;
+  color: var(--text);
+}
+
+.summary-block a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.summary-block a:hover {
+  color: var(--accent-hover);
+}
 
 /* ------------------------------ skills ------------------------------ */
 .skills {
