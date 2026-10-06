@@ -5,22 +5,26 @@ const PROJECT_TEXT = {
     {
       "heading": "",
       "paragraphs": [
-        "<p>Under my leadership, my GEEN 1400 projects team created a unique two-player racing game which features two tactile stick-shift models as controllers and RPM gauges instead of a screen.</p>",
-        "<p>My team and I noticed the lack of affordable, user-friendly video-game-like experiences on the market, inspiring us to create a first-of-its-kind console that includes all the fun and none of the unnecessary complexity or expenses of a traditional video game console.</p>",
-        "<p>The controllers are remixed from an existing 3d printable fidget-toy car shifter model, which I evolved into a functional and durable controller for our game. Our controller is modified to fit six limit switches, located carefully to be adequately sensitive to shifting motions but not overly fragile.</p>"
+        "<p>Under my leadership, my GEEN 1400 projects team created a unique two-player racing game which features two tactile stick-shifter controllers and servo-controlled RPM gauges instead of a screen, and two neopixel strips to represent the cars on the track.</p>",
+        "<p>My team and I noticed the lack of affordable, user-friendly video-game-like experiences on the market, inspiring us to create an affordable, intuitive, fun, and screenless alternative to a traditional console.</p>"
+      ]
+    },
+    {
+      "heading": "Controllers",
+      "paragraphs": [
+        "<p>The controllers are remixed from an existing 3d printable fidget-toy car shifter model, which I converted into a functional and durable controller for our game. I modified the original design to fit six limit switches, one per gear position, which is depressed by the shifer stick when it slides into gear.</p>"
       ]
     },
     {
       "heading": "Logic and code",
       "paragraphs": [
-        "<p>Before writing code, we made a diagram of all possible inputs to outputs.</p>",
-        "<p>I cleanly translated our I/O diagram into Arduino logic with an object-oriented coding approach. The Controller class defines variables which each Controller object needs to keep track of: current gear, its own full pinout, and the state of its corresponding LED. The broader Car class defines functions and variables for each player, as well as holding a reference to the corresponding Controller. The finished code was robust enough to keep track of all the necessary variables for each controller, NeoPixel strip, and servo, and carefully time the logical handling of all the inputs and outputs to create a fluid, enjoyable game experience.</p>"
+        "<p>Before writing code, we diagrammed our inputs, outputs, and possible states. I then translated our I/O diagram into Arduino logic, and implemented an object-oriented coding approach. The Controller class defines variables which each Controller object needs to keep track of: current gear, its own full pinout, and the state of its corresponding LED. The broader Car class defines functions and variables for each player, as well as holding a reference to its corresponding Controller object. The finished code was robust enough to keep track of all the necessary variables for each controller, NeoPixel strip, and servo, and carefully time the logical handling of all the inputs and outputs to create a fluid, enjoyable game experience.</p>"
       ]
     },
     {
       "heading": "Wiring",
       "paragraphs": [
-        "<p>I laid out the wiring in such a way to minimize unnecessary jumper cables and maximize organization in the case of malfunction, completely redoing the wiring several times to make it as failsafe and clean as possible.</p>"
+        "<p>I laid out the wiring as cleanly as possible, with the goal to minimize unnecessary jumper cables and maximize organization. Most of the circuitry, the arduino itself, and a power rail all fit in the main console's enclosure; only a small breadboard had to stay outside the main enclosure so that the \"burnout LEDs\" were easily visible.</p>"
       ]
     }
   ],
@@ -28,8 +32,8 @@ const PROJECT_TEXT = {
     {
       "heading": "",
       "paragraphs": [
-        "<p>During my senior year of high school, some family friends gave me a very broken electric guitar. The headstock was cracked clean in half. The pickguard was shattered and filthy. And it didn’t make any noise at all.</p>",
-        "<p>Upon further research, it was briefly made sometime in the 1960s by a now-defunct company, and had no documentation whatsoever. It really seemed like a lost cause. I took off the pickguard and cleaned everything up; after spending increasingly long hours admiring its components, I figured I might as well just fix the thing.</p>"
+        "<p>During my senior year of high school, some family friends gave me a very broken electric guitar. The headstock was cracked clean in half. The pickguard was shattered and dirty. And it didn’t make any noise at all.</p>",
+        "<p>Upon further research, it was briefly made sometime in the 1960s by a now-defunct company, and had no documentation whatsoever. It really seemed like a lost cause. I took off the pickguard and cleaned everything up; after spending increasingly long hours admiring its components, I figured I might as well just fix it.</p>"
       ]
     },
     {
@@ -41,8 +45,8 @@ const PROJECT_TEXT = {
     {
       "heading": "Pickguard",
       "paragraphs": [
-        "<p>(The pickguard is the name for the plastic plate that protects the wood face of the guitar. In my case, all the electronics were mounted to it, instead of to the wood itself). I thought I was done with the guitar after I’d redone the wiring; I put a bit of superglue on the original pickguard and called it good. It took exactly one jam session with friends to re-break it--I pulled out the instrument cable at a funny angle, and the pickguard cracked agin.</p>",
-        "<p>I took off the broken pickguard, put it together one last time, and stuck it in my school’s industrial photocopier. After using Fusion 360 to trace and scale it, I laser cut a new one out of clear acrylic and used a dremel to scuff some pretty patterns into it. Having a clear pickguard is unusual, and leads to some interesting possibilities…</p>"
+        "<p>(The pickguard is the name for the plastic plate that protects the wood face of the guitar). I thought I was done with the guitar after I’d redone the wiring; I put a bit of superglue on the original pickguard and called it good. It only took one jam session to re-break it by pulling instrument cable out at a funny angle.</p>",
+        "<p>I took off the broken pickguard, put it together one last time, and put it through my school’s industrial photocopier. After using Fusion 360 to trace and scale it, I laser cut a new one out of clear acrylic and used a dremel to scuff some pretty patterns into it. Having a clear pickguard is unusual, and leads to some interesting possibilities…</p>"
       ]
     },
     {
@@ -78,11 +82,25 @@ const PROJECT_TEXT = {
       ]
     }
   ],
-  "placeholder": [
+  "vex-code": [
     {
-      "heading": "Placeholder Heading",
+      "heading": "",
       "paragraphs": [
-        "<p>Content coming soon.</p>"
+        "<p>This is the code I developed for my VEX VRC robotics team during the 2023-2024 VEX game, “Over Under”.</p>"
+      ]
+    },
+    {
+      "heading": "Autonomous recorder",
+      "paragraphs": [
+        "<p>Stores the position of the left joystick, right joystick, and intake/outtake button to the SD card every 20ms; allows the user to select a recording to play back. That way, our team’s driver could record himself actually driving for 15 seconds, and we could replay the recording during the autonomous period of real competitions.</p>"
+      ]
+    },
+    {
+      "heading": "Autonomous code",
+      "paragraphs": [
+        "<p>Features:</p>",
+        "<ul><li>Simple PID function to smoothly drive a specified distance and avoid overshooting.</li><li>Function that uses feedback from gyroscope to rotate in place a specific number of degrees.</li><li>”Asymmetric driving” function to move the robot in a curve or spline: set chassis left and right side power independently.</li></ul>",
+        "<p><strong>Please note:</strong> I was in high school when I wrote this, so it’s not perfect. I cleaned up some comments and variable names in 2026, and fixed a couple of the obvious bugs, but there may be bugs I never caught!</p>"
       ]
     }
   ]

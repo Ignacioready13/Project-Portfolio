@@ -31,6 +31,13 @@
                 Put files in a folder under media/ and point src to it, e.g.
                 "media/my-project/photo.jpg".
 
+     type     : optional. Set the "type" field to "grid" to render this panel
+                as a card grid of smaller projects (no carousel or summary
+                text). Grid projects fill in `items` below and omit gallery
+                and skills.
+     items    : for grid projects only. List of small-project cards, each with:
+                  { title, image, text, skills?, github? }
+
    IMPORTANT: images must be JPG/PNG/WebP (NOT .HEIC), and videos must be
    .mp4 (ideally small and with no audio track). See README.md for how to
    convert media.
@@ -50,10 +57,10 @@ const PROJECTS = [
     skills: ["Arduino", "C++", "Embedded systems"],
 
     gallery: [
+      { type: "video", src: "media/racing-game/racing-demo.mp4",     caption: "Two playthroughs of the final game. Blue Player 'burns out' their car late in the second game (by skipping a gear)." },
       { type: "image", src: "media/racing-game/full-view.jpg",       caption: "The final project, seen with two controllers connected and the game ready to play. Note the two dials indicating RPM and the two NeoPixel strips (unlit in this photo) to indicate car distance along the track." },
       { type: "image", src: "media/racing-game/prototype.jpg",       caption: "An early prototype, featuring only one controller and rudimentary dial. Notice the limit switches are glued to the top of the controller before the design was modified to accommodate the switches internally" },
       { type: "image", src: "media/racing-game/wiring-topdown.jpg",  caption: "The final design, shown with all the wiring exposed. Notice the 4xAA pack used to power the servos separately, and the breadboard featuring two LEDs to indicate to each player when they stall their car." },
-      { type: "video", src: "media/racing-game/racing-demo.mp4",     caption: "Two playthroughs of the final game. Blue Player 'burns out' their car late in the second game (by skipping a gear)." },
       { type: "image", src: "media/racing-game/wiring-closeup.jpg",  caption: "Our prototype needed a second breadboard to keep the LEDs visible." }
     ]
   },
@@ -128,16 +135,39 @@ const PROJECTS = [
      PROJECT 6 — placeholder
      ===================================================================== */
   {
-    tab: "Placeholder",
-    title: "",
+    tab: "VEX code",
+    title: "VEX autonomous & control code for 23-24 'Over Under' challenge",
     subtitle: "",
-
+    github: "https://github.com/Ignacioready13/VEX-OverUnder-2654H",
     skills: ["#"],
 
-    gallery: [
-      { type: "image", src: "media/placeholders/placeholder-1.svg", caption: "Placeholder image one." },
-      { type: "image", src: "media/placeholders/placeholder-2.svg", caption: "Placeholder image two." },
-      { type: "image", src: "media/placeholders/placeholder-3.svg", caption: "Placeholder image three." }
+    
+  },
+
+  /* =====================================================================
+     PROJECT 7 — More projects (grid)
+     ---------------------------------------------------------------------
+     A "grid" project renders as a card grid instead of a carousel. Each
+     card is { title, image, text, skills?, github? }. The cards below are
+     EXAMPLES — replace them with your real smaller projects (or delete the
+     extra examples).
+     ===================================================================== */
+
+  {
+    type: "grid",
+    tab: "More projects",
+    title: "More projects",
+    subtitle: "Smaller projects and experiments, in brief.",
+
+    items: [
+      {
+        title: "Revived 3d printer",
+        image: "media/more/FrankensteinPrinter.png",
+        text: "Successfully revived dead 3D printer: debugged misbehaving extruder motor, swapped in mismatched Anet A8 board, reconfigured & re-flashed Marlin firmware to accommodate smaller axes & unheated bed.",
+        //skills: ["Skill", "Skill", "Skill"]
+        //github: "https://github.com/yourname/example-one"
+      }
+      
     ]
   }
 

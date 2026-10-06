@@ -37,7 +37,22 @@ def slugify(name):
 def extract_tabs():
     with open(CONTENT_JS, encoding="utf-8") as f:
         src = f.read()
-    return re.findall(r'^\s*tab\s*:\s*"([^"]*)"', src, re.MULTILINE)
+
+    # Grid-type projects carry their text in the `items` array in content.js,
+    # not in a markdown file, so their tab should not get a markdown
+    # placeholder or a PROJECT_TEXT entry.
+    grid_tabs = set()
+    for gm in re.finditer(r'type\s*:\s*"grid"', src):
+        tail = src[gm.end():]
+        end = tail.find('}')
+        if end == -1:
+            continue
+        m = re.search(r'tab\s*:\s*"([^"]*)"', tail[:end])
+        if m:
+            grid_tabs.add(m.group(1))
+
+    tabs = re.findall(r'^\s*tab\s*:\s*"([^"]*)"', src, re.MULTILINE)
+    return [t for t in tabs if t not in grid_tabs]
 
 
 # ------------------------ minimal markdown -> HTML ------------------------

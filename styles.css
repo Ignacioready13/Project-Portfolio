@@ -171,6 +171,10 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .panel.active { animation: none; }
+}
+
 .project-title {
   font-size: 1.6rem;
   margin: 4px 0 4px;
@@ -309,6 +313,7 @@ body {
 }
 
 .slide-media {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -322,6 +327,7 @@ body {
   height: 100%;
   object-fit: contain;
   display: block;
+  cursor: zoom-in;
 }
 
 .slide-media video {
@@ -410,6 +416,223 @@ body {
   margin: 10px 0 0;
 }
 
+.media-expand {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(16, 24, 40, 0.35);
+  background: #ffffff;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  z-index: 2;
+}
+
+.media-expand:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.media-expand:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------- card grid ----------------------------- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s ease;
+}
+
+.card:hover { box-shadow: var(--shadow-md); }
+
+.card-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #eef0f3;
+  cursor: zoom-in;
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.card-media:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.card-media-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(16, 24, 40, 0.35);
+  background: #ffffff;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px 16px 16px;
+  flex: 1;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.card-text {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+}
+
+.card-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.card-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-link {
+  align-self: flex-start;
+  color: var(--accent);
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.card-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ----------------------------- lightbox ----------------------------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 14, 22, 0.86);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 32px;
+  animation: lightboxFade 0.18s ease;
+}
+
+@keyframes lightboxFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+}
+
+.lightbox-close:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.lightbox-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.lightbox-media img,
+.lightbox-media video {
+  display: block;
+  color: #e5e9f0;
+  max-width: min(92vw, 1200px);
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius);
+  background: #0b0e14;
+  box-shadow: var(--shadow-md);
+}
+
+.lightbox-caption {
+  margin: 0;
+  color: #e5e9f0;
+  font-size: 0.95rem;
+  text-align: center;
+  max-width: min(92vw, 1200px);
+}
+
 /* ------------------------------ footer ------------------------------ */
 .site-footer {
   margin-top: 36px;
@@ -431,4 +654,7 @@ body {
   .carousel-btn { width: 32px; height: 32px; }
   .carousel-btn.prev { left: 8px; }
   .carousel-btn.next { right: 8px; }
+  .media-expand { width: 30px; height: 30px; top: 8px; right: 8px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .lightbox { padding: 18px; }
 }

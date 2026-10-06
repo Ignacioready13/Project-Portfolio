@@ -45,6 +45,40 @@
     return s;
   }
 
+  function svgExpand() {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', '18');
+    s.setAttribute('height', '18');
+    s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', 'currentColor');
+    p.setAttribute('stroke-width', '2');
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('d', 'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7');
+    s.appendChild(p);
+    return s;
+  }
+
+  function svgClose() {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', '22');
+    s.setAttribute('height', '22');
+    s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', 'currentColor');
+    p.setAttribute('stroke-width', '2');
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('d', 'M18 6L6 18M6 6l12 12');
+    s.appendChild(p);
+    return s;
+  }
+
   /* ------------------------------ tabs ------------------------------ */
   function buildTabs() {
     projects.forEach(function (proj, i) {
@@ -101,7 +135,21 @@
         img.alt = item.caption || '';
         img.loading = 'lazy';
         media.appendChild(img);
+        media.addEventListener('click', function () {
+          lightbox.open(item, root);
+        });
       }
+
+      var expand = make('button', 'media-expand');
+      expand.type = 'button';
+      expand.setAttribute('aria-label', 'Enlarge');
+      expand.appendChild(svgExpand());
+      expand.addEventListener('click', function (e) {
+        e.stopPropagation();
+        lightbox.open(item, root);
+      });
+      media.appendChild(expand);
+
       slide.appendChild(media);
       track.appendChild(slide);
     });
@@ -189,6 +237,157 @@
     return root;
   }
 
+  /* ---------------------------- lightbox ---------------------------- */
+  function buildLightbox() {
+    var overlay = make('div', 'lightbox');
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Media viewer');
+    overlay.hidden = true;
+
+    var closeBtn = make('button', 'lightbox-close');
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.appendChild(svgClose());
+
+    var media = make('div', 'lightbox-media');
+    var caption = make('p', 'lightbox-caption');
+    caption.hidden = true;
+
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(media);
+    overlay.appendChild(caption);
+
+    document.body.appendChild(overlay);
+
+    var resumeCarousel = null;
+    var lastFocus = null;
+
+    function clear() {
+      var v = media.querySelector('video');
+      if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
+      media.textContent = '';
+      caption.textContent = '';
+      caption.hidden = true;
+    }
+
+    function open(item, sourceCarousel) {
+      clear();
+      resumeCarousel = sourceCarousel || null;
+      if (sourceCarousel && sourceCarousel.pause) sourceCarousel.pause();
+
+      if (item && item.type === 'video') {
+        var v = document.createElement('video');
+        v.setAttribute('controls', '');
+        v.setAttribute('autoplay', '');
+        v.setAttribute('loop', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('muted', '');
+        v.src = item.src;
+        media.appendChild(v);
+      } else if (item) {
+        var img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.caption || item.title || '';
+        media.appendChild(img);
+      }
+
+      if (item && (item.caption || item.title)) {
+        caption.textContent = item.caption || item.title;
+        caption.hidden = false;
+      }
+
+      lastFocus = document.activeElement;
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      closeBtn.focus();
+    }
+
+    function close() {
+      if (overlay.hidden) return;
+      overlay.hidden = true;
+      document.body.style.overflow = '';
+      clear();
+      if (resumeCarousel && resumeCarousel.play) resumeCarousel.play();
+      resumeCarousel = null;
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+      lastFocus = null;
+    }
+
+    closeBtn.addEventListener('click', close);
+
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (overlay.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); close(); }
+    });
+
+    return { open: open, close: close };
+  }
+
+  /* --------------------------- card grid ---------------------------- */
+  function buildGrid(proj) {
+    var grid = make('div', 'card-grid');
+    (proj.items || []).forEach(function (item) {
+      var card = make('article', 'card');
+
+      var mediaWrap = make('div', 'card-media');
+      mediaWrap.setAttribute('role', 'button');
+      mediaWrap.setAttribute('tabindex', '0');
+      mediaWrap.setAttribute('aria-label', 'Enlarge ' + (item.title || 'image'));
+      var img = document.createElement('img');
+      img.src = item.image || '';
+      img.alt = item.title || '';
+      img.loading = 'lazy';
+      mediaWrap.appendChild(img);
+      var icon = make('span', 'card-media-icon');
+      icon.setAttribute('aria-hidden', 'true');
+      icon.appendChild(svgExpand());
+      mediaWrap.appendChild(icon);
+      var openCard = function () {
+        lightbox.open({ type: 'image', src: item.image, caption: item.title }, null);
+      };
+      mediaWrap.addEventListener('click', openCard);
+      mediaWrap.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCard(); }
+      });
+      card.appendChild(mediaWrap);
+
+      var body = make('div', 'card-body');
+      body.appendChild(make('h3', 'card-title', item.title || ''));
+
+      if (item.text) {
+        var p = make('p', 'card-text');
+        p.textContent = item.text;
+        body.appendChild(p);
+      }
+
+      if ((item.skills && item.skills.length) || item.github) {
+        var footer = make('div', 'card-footer');
+        if (item.skills && item.skills.length) {
+          var skillsWrap = make('div', 'card-skills');
+          item.skills.forEach(function (s) { skillsWrap.appendChild(make('span', 'chip', s)); });
+          footer.appendChild(skillsWrap);
+        }
+        if (item.github) {
+          var link = make('a', 'card-link', 'View on GitHub');
+          link.href = item.github;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          footer.appendChild(link);
+        }
+        body.appendChild(footer);
+      }
+
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+    return grid;
+  }
+
   /* ---------------------------- panels ------------------------------ */
   function buildPanels() {
     projects.forEach(function (proj, i) {
@@ -200,6 +399,12 @@
       panel.appendChild(make('h2', 'project-title', proj.title || proj.tab));
 
       if (proj.subtitle) panel.appendChild(make('p', 'project-subtitle', proj.subtitle));
+
+      if (proj.type === 'grid') {
+        panel.appendChild(buildGrid(proj));
+        panelsEl.appendChild(panel);
+        return;
+      }
 
       var summary = projectText[slugify(proj.tab)] || [];
       if (summary.length) {
@@ -265,6 +470,7 @@
   }
 
   /* ----------------------------- init ------------------------------- */
+  var lightbox = buildLightbox();
   buildTabs();
   buildPanels();
   switchTab(0);
