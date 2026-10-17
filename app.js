@@ -79,10 +79,101 @@
     return s;
   }
 
+  function svgHome() {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', '16');
+    s.setAttribute('height', '16');
+    s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', 'currentColor');
+    p.setAttribute('stroke-width', '2');
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('d', 'M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5');
+    s.appendChild(p);
+    return s;
+  }
+
+  function prefersReducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  /* ---------------------------- thumbnails --------------------------- */
+  /* A thumbnail is a still image or a muted, looping, control-less video
+     that fills its (square) tile. `thumb` is { type, src, position? }. */
+  function buildThumb(thumb) {
+    var wrap = make('span', 'thumb');
+    if (!thumb || !thumb.src) {
+      wrap.className = 'thumb thumb-empty';
+      return wrap;
+    }
+    var position = thumb.position || 'center';
+    if (thumb.type === 'video') {
+      var v = document.createElement('video');
+      v.className = 'thumb-video';
+      v.muted = true;
+      v.defaultMuted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.setAttribute('muted', '');
+      v.setAttribute('loop', '');
+      v.setAttribute('playsinline', '');
+      v.setAttribute('preload', 'auto');
+      v.setAttribute('disablepictureinpicture', '');
+      v.setAttribute('controlslist', 'nodownload noplaybackrate noremoteplayback');
+      v.setAttribute('aria-hidden', 'true');
+      v.tabIndex = -1;
+      v.style.objectPosition = position;
+      v.src = thumb.src;
+      if (!prefersReducedMotion()) {
+        v.autoplay = true;
+        v.setAttribute('autoplay', '');
+      }
+      wrap.appendChild(v);
+    } else {
+      var img = document.createElement('img');
+      img.src = thumb.src;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.style.objectPosition = position;
+      wrap.appendChild(img);
+    }
+    return wrap;
+  }
+
+  function thumbForProject(proj) {
+    // An explicit `thumb: null` means "no media"; otherwise fall back to the
+    // first gallery item so older projects need no extra configuration.
+    if ('thumb' in proj) return proj.thumb;
+    if (proj.gallery && proj.gallery.length) return proj.gallery[0];
+    return null;
+  }
+
+  function thumbForItem(item) {
+    if (item.video) return { type: 'video', src: item.video, position: item.position };
+    if (item.image) return { type: 'image', src: item.image, position: item.position };
+    return null;
+  }
+
+  function initials(name) {
+    var words = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return '?';
+    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+
   /* ------------------------------ tabs ------------------------------ */
   function buildTabs() {
     projects.forEach(function (proj, i) {
-      var btn = make('button', 'tab', proj.tab || ('Project ' + (i + 1)));
+      var isHome = proj.type === 'home';
+      var btn = make('button', 'tab' + (isHome ? ' tab-home' : ''), proj.tab || ('Project ' + (i + 1)));
+      if (isHome) {
+        btn.textContent = '';
+        btn.appendChild(svgHome());
+        btn.appendChild(make('span', null, proj.tab || 'Homepage'));
+      }
       btn.id = 'tab-' + i;
       btn.type = 'button';
       btn.setAttribute('role', 'tab');
@@ -329,26 +420,25 @@
   }
 
   /* --------------------------- card grid ---------------------------- */
-  function buildGrid(proj) {
+  function buildGrid(proj, panelIndex) {
     var grid = make('div', 'card-grid');
-    (proj.items || []).forEach(function (item) {
+    (proj.items || []).forEach(function (item, itemIndex) {
       var card = make('article', 'card');
+      card.id = 'card-' + panelIndex + '-' + itemIndex;
 
       var mediaWrap = make('div', 'card-media');
       mediaWrap.setAttribute('role', 'button');
       mediaWrap.setAttribute('tabindex', '0');
       mediaWrap.setAttribute('aria-label', 'Enlarge ' + (item.title || 'image'));
-      var img = document.createElement('img');
-      img.src = item.image || '';
-      img.alt = item.title || '';
-      img.loading = 'lazy';
-      mediaWrap.appendChild(img);
+      mediaWrap.appendChild(buildThumb(thumbForItem(item)));
       var icon = make('span', 'card-media-icon');
       icon.setAttribute('aria-hidden', 'true');
       icon.appendChild(svgExpand());
       mediaWrap.appendChild(icon);
       var openCard = function () {
-        lightbox.open({ type: 'image', src: item.image, caption: item.title }, null);
+        var thumb = thumbForItem(item);
+        if (!thumb) return;
+        lightbox.open({ type: thumb.type, src: thumb.src, caption: item.title }, null);
       };
       mediaWrap.addEventListener('click', openCard);
       mediaWrap.addEventListener('keydown', function (e) {
@@ -388,44 +478,124 @@
     return grid;
   }
 
+  /* ---------------------------- homepage ---------------------------- */
+  function buildHomeTile(entry) {
+    var btn = make('button', 'home-tile');
+    btn.type = 'button';
+    var thumb = buildThumb(entry.thumb);
+    if (!entry.thumb) {
+      var badge = make('span', 'thumb-initials', initials(entry.title));
+      badge.setAttribute('aria-hidden', 'true');
+      thumb.appendChild(badge);
+    }
+    btn.appendChild(thumb);
+    btn.appendChild(make('span', 'home-tile-caption', entry.title));
+    btn.addEventListener('click', function () {
+      if (typeof entry.itemIndex === 'number') {
+        switchTab(entry.projectIndex, { highlight: entry.itemIndex });
+      } else {
+        switchTab(entry.projectIndex);
+      }
+    });
+    return btn;
+  }
+
+  function buildHomeSection(label, entries) {
+    var section = make('section', 'home-section');
+    section.appendChild(make('h3', 'section-label', label));
+    var grid = make('div', 'home-grid');
+    entries.forEach(function (entry) { grid.appendChild(buildHomeTile(entry)); });
+    section.appendChild(grid);
+    return section;
+  }
+
+  function buildHomePanel(proj, panelIndex) {
+    var panel = make('section', 'panel' + (panelIndex === 0 ? ' active' : ''));
+    panel.id = 'panel-' + panelIndex;
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('aria-labelledby', 'tab-' + panelIndex);
+
+    var mainEntries = [];
+    var miniEntries = [];
+
+    projects.forEach(function (p, i) {
+      if (i === panelIndex || p.type === 'home') return;
+
+      if (p.type === 'grid') {
+        (p.items || []).forEach(function (item, itemIndex) {
+          miniEntries.push({
+            title: item.title || 'Mini-project',
+            thumb: thumbForItem(item),
+            projectIndex: i,
+            itemIndex: itemIndex
+          });
+        });
+        return;
+      }
+
+      mainEntries.push({
+        title: p.tab || p.title || ('Project ' + (i + 1)),
+        thumb: thumbForProject(p),
+        projectIndex: i
+      });
+    });
+
+    if (mainEntries.length) panel.appendChild(buildHomeSection('Projects', mainEntries));
+    if (miniEntries.length) panel.appendChild(buildHomeSection('Mini-projects', miniEntries));
+    return panel;
+  }
+
   /* ---------------------------- panels ------------------------------ */
+  function renderSummaryBlocks(blocks) {
+    var wrap = make('div', 'summary');
+    blocks.forEach(function (block) {
+      var b = make('div', 'summary-block');
+      if (block.heading) {
+        var h = make('h3', 'summary-heading');
+        h.innerHTML = block.heading;
+        b.appendChild(h);
+      }
+      b.insertAdjacentHTML('beforeend', (block.paragraphs || []).join(''));
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+
   function buildPanels() {
     projects.forEach(function (proj, i) {
+      if (proj.type === 'home') {
+        panelsEl.appendChild(buildHomePanel(proj, i));
+        return;
+      }
+
       var panel = make('section', 'panel' + (i === 0 ? ' active' : ''));
       panel.id = 'panel-' + i;
       panel.setAttribute('role', 'tabpanel');
       panel.setAttribute('aria-labelledby', 'tab-' + i);
 
       panel.appendChild(make('h2', 'project-title', proj.title || proj.tab));
-
       if (proj.subtitle) panel.appendChild(make('p', 'project-subtitle', proj.subtitle));
 
       if (proj.type === 'grid') {
-        panel.appendChild(buildGrid(proj));
+        panel.appendChild(buildGrid(proj, i));
         panelsEl.appendChild(panel);
         return;
       }
 
       var summary = projectText[slugify(proj.tab)] || [];
-      if (summary.length) {
-        var sumWrap = make('div', 'summary');
-        summary.forEach(function (block) {
-          var b = make('div', 'summary-block');
-          if (block.heading) {
-            var h = make('h3', 'summary-heading');
-            h.innerHTML = block.heading;
-            b.appendChild(h);
-          }
-          b.insertAdjacentHTML('beforeend', (block.paragraphs || []).join(''));
-          sumWrap.appendChild(b);
-        });
-        panel.appendChild(sumWrap);
-      }
+      var rest = summary.slice();
+      var intro = [];
+      // Text written before the first heading leads the page, above the
+      // carousel; everything from the first heading on comes after it.
+      if (rest.length && !rest[0].heading) intro = rest.splice(0, 1);
+
+      if (intro.length) panel.appendChild(renderSummaryBlocks(intro));
 
       if (proj.gallery && proj.gallery.length) {
-        panel.appendChild(make('div', 'section-label', 'Gallery'));
         panel.appendChild(buildCarousel(proj.gallery));
       }
+
+      if (rest.length) panel.appendChild(renderSummaryBlocks(rest));
 
       if (proj.skills && proj.skills.length) {
         panel.appendChild(make('div', 'section-label', 'Skills'));
@@ -441,7 +611,7 @@
   }
 
   /* --------------------------- switching ---------------------------- */
-  function switchTab(i) {
+  function switchTab(i, opts) {
     var tabs = tabsEl.querySelectorAll('.tab');
     tabs.forEach(function (t, idx) {
       t.setAttribute('aria-selected', idx === i ? 'true' : 'false');
@@ -454,6 +624,14 @@
         if (active && c.play) c.play();
         else if (c.pause) c.pause();
       });
+      p.querySelectorAll('.thumb-video').forEach(function (v) {
+        if (active && !prefersReducedMotion()) {
+          var playing = v.play();
+          if (playing && playing.catch) playing.catch(function () {});
+        } else {
+          v.pause();
+        }
+      });
     });
 
     var proj = projects[i];
@@ -464,6 +642,22 @@
     } else {
       githubBtn.hidden = true;
       toolbarEl.hidden = true;
+    }
+
+    var highlight = (opts && typeof opts.highlight === 'number') ? opts.highlight : -1;
+    if (highlight >= 0) {
+      var cards = panels[i].querySelectorAll('.card');
+      var card = cards[highlight];
+      if (card) {
+        card.classList.remove('card-highlight');
+        void card.offsetWidth;
+        card.classList.add('card-highlight');
+        window.setTimeout(function () { card.classList.remove('card-highlight'); }, 3200);
+        requestAnimationFrame(function () {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        return;
+      }
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });

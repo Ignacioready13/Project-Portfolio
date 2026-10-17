@@ -58,6 +58,73 @@ const PROJECT_TEXT = {
       ]
     }
   ],
+  "neural-game-engine": [
+    {
+      "heading": "",
+      "paragraphs": [
+        "<p>A first-person neural game engine styled after the Backrooms, fully implemented by DeepSeek and trained on a single NVIDIA 5070 laptop GPU.</p>"
+      ]
+    },
+    {
+      "heading": "<strong>AI Disclaimer</strong>",
+      "paragraphs": [
+        "<p>All of the code for this project was written by DeepSeek, not me. My role was designing the functionality of the engine; DeepSeek's role was the software implementation. <strong>All the designs and ideas I wrote here are my own ideas.</strong> It collectively took ~5,000 words of my prompting across multiple sessions to convey to DeepSeek my full design, have DeepSeek implement and test it in phases, and give DeepSeek feedback and ask for changes throughout the process.</p>"
+      ]
+    },
+    {
+      "heading": "Quick background: neural game engines",
+      "paragraphs": [
+        "<p><strong>Traditional game engines</strong> used in computer games are structured to repeatedly:</p>",
+        "<ul><li>Update the game state based on input</li><li>Render frames to the screen based on the game state</li></ul>",
+        "<p>This game state might include a player’s position, positions of other entities, and camera angles.</p>",
+        "<p>On the other hand, <strong>a neural game engine doesn’t have an explicit state beyond its own past few frames and the user’s input.</strong></p>",
+        "<p>Its core is centered about a neural network (a diffusion model in my case): <strong>Inputs:</strong></p>",
+        "<ul><li>Some set of past frames.</li><li>My network reads in the last <strong>four</strong> frames each time I need a new frame.</li><li>Input from the user (mouse movement, key presses)</li><li>My network takes in the x position of the user's last click, and keeps that as the heading input for all subsequent frame generations until the user makes a new click.</li></ul>",
+        "<p><strong>Outputs:</strong></p>",
+        "<ul><li>The diffusion model generates the next frame based on the inputs.</li></ul>",
+        "<p>We train this <strong>neural game engine</strong> off of the data (frames with labeled inputs) which we generate from having many simple bots traversing instances of the <strong>traditional game environment</strong> in parallel.</p>",
+        "<p>Henceforth I'll refer to the traditional game engine used for training as the <em>engine</em>, and I'll refer to the neural game engine itself as the <em>model</em> or the <em>neural network</em>.</p>"
+      ]
+    },
+    {
+      "heading": "About my engine design",
+      "paragraphs": [
+        "<p>I designed the traditional engine in a way that lends itself to training a neural game engine on limited resources. Concretely, my engine's functionality needs to be well-defined and well-constrained so that the neural network has an easier time predicting its behavior. The limited input which I allow from the user needs to lead to <em>learnable</em> changes in the environment.</p>"
+      ]
+    },
+    {
+      "heading": "List of <strong>constraints</strong> and <strong>freedoms</strong> I designed for my engine:",
+      "paragraphs": [
+        "<p>Because my goal was to train a complex neural game engine on a single laptop GPU, I had to constrain the traditional engine as much as possible (while retaining an aspect of user choice) so that I could train a reasonably coherent model on limited hardware.</p>",
+        "<ol><li><strong>Environment</strong>: all scenes in this game take place in a Backrooms-style maze of hallways and rooms. That's the only environment the network needs to learn.</li><li><strong>Movement</strong>: the view is always moving forwards, along the current viewing direction, at a constant pace. The network doesn't need to learn what it means for a camera to stop, move slowly, move quickly, or turn in place.</li><li><strong>Camera</strong>: the camera may only look left and right; the network does not need to learn up-and-down camera movements. The left-and-right movement is not free, but is constrained by limited inputs described in (4).</li><li><strong>Input</strong>: The only input the engine reacts to is the x-position of a user's clicks; this is the only true freedom of my engine. The player may steer towards any <em>reachable</em> doorway by clicking on it; the engine only accepts their navigational choice if the click clearly indicates a certain doorway and that doorway is reachable by a path that won't require camera movements over a certain 'sudden-ness' threshold. If the engine accepts the click, it steers the camera along a calculatedly smooth path through it. If the player does not click (or their click is rejected) the engine keeps heading towards the doorway most directly ahead of the camera.</li></ol>",
+        "<p>By balancing constraints and freedoms, I have allowed the user to retain control over where they walk in my engine (the user still feels like they are exploring the environment themselves), but massively reduced the difficulty of training a neural network to emulate this engine.</p>"
+      ]
+    },
+    {
+      "heading": "Rules of procedural generation",
+      "paragraphs": [
+        "<p>For me, the intrigue of a neural game engine lies in its inherent <em>unpredictability</em>. While fascinating, projects which aim to perfectly replicate a totally concrete game environment will ultimately just create a blurrier version of something that already exists. Instead, I aim to <em>encourage</em> this unpredictability and inventiveness to train a model which generates/hallucinates interesting, novel environments that couldn't have been made in a traditional game engine. My first step towards this goal was procedural generation.</p>",
+        "<p>Because the view in my game is <em>always moving forwards</em>, there <em>always</em> needs to be an available doorway directly ahead of the player. With careful procedural generation rules, my engine can generate the world on the fly, as the player moves around.</p>",
+        "<p>There are two types of <strong>spaces</strong>: <strong>rooms</strong> and <strong>hallways</strong>. Any <strong>space</strong> has 4 walls, a ceiling, and a floor. 90 degree angles; spaces are always rectangular prisms. The only <strong>spaces</strong> that <strong>exist at a given moment</strong> are the <em>space that the player is standing in</em>, and <em>all spaces directly adjacent to the space the player is standing in</em>. For instance, if a player is standing in a room A, and room A has three doorways, then there are three spaces (rooms or hallways) adjacent to room A, each of which is fully visible and accessible through the doorway joining it and room A.</p>",
+        "<p>Let's say that room B, hall C, and room D are the three adjacent spaces. Room B, hall A, and room C must also have doorways, but their doorways (besides the one adjoining each to room A) are fully filled in with a black texture.</p>",
+        "<p>As soon as the player steps into room B, the black doorways are lifted from all of room B's doorways, revealing <em>its</em> adjacent spaces, which the engine randomly selects right at that moment (with randomized dimensions and doorway locations). Hall C and room D are removed from memory. In this way, we can simultaneously eliminate the computational complexity of trying to generate many layers of rooms which must not overlap, and eliminate the graphical complexity of rendering many distant wall faces we may never reach. That way our engine can generate the training data quickly and efficiently.</p>",
+        "<p>So, as the player traverses their environment, rooms and hallways are removed and added on-demand with no regard for where something <em>used</em> to be; there is no such thing as backtracking. By basing the engine off of random number generation, I aimed to introduce the same intrigue and 'exploration-based' environment into the neural model itself.</p>"
+      ]
+    },
+    {
+      "heading": "Current status",
+      "paragraphs": [
+        "<p>Model flow96e, currently the best model, is able to consistently give the impression of being in a series of hallways and rooms (for the most part, it avoids devolving into static). It's able to show fluorescent lights passing by on the ceiling and occasionally able to hallucinate doorways in blank walls, but it lacks the ability to invent a distinct feature like a doorway or hallway bend and then maintain it until the camera passes it. For the most part, it always shows motion down a long forward-facing hallway or towards a morphing blank wall, and clicking has little noticable effect.</p>"
+      ]
+    },
+    {
+      "heading": "Future goals",
+      "paragraphs": [
+        "<p>In the short-term, future models should do a better job generating concrete, recognizable features that move past the player as explained above. Future models should also be more responsive to clicking and avoid 'stopping in front of a blank wall' like flow96e does.</p>",
+        "<p>In the long-term, once future models can consistently turn down hallway bends and show well-defined features like doorways, I'd like to focus on adding to the 'inventiveness' aspects of the models. I've had the idea to randomly pull textures and models from the internet and display them on random walls and in random corners during training, and see what interesting combinations of shapes and colors the model learns to show during runtime.</p>"
+      ]
+    }
+  ],
   "sdr-mount": [
     {
       "heading": "Compact phone and SDR transceiver module",
@@ -78,7 +145,8 @@ const PROJECT_TEXT = {
     {
       "heading": "Placeholder Heading",
       "paragraphs": [
-        "<p>A Roblox game I worked on for a couple years in high school. More info to come.</p>"
+        "<p>A Roblox game I worked on for a couple years in high school.</p>",
+        "<p>More info to come.</p>"
       ]
     }
   ],

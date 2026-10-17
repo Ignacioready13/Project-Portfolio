@@ -11,5 +11,9 @@ Thumbs.db
 # Local scratch / logs
 *.log
 
+# Local, untracked change notes / documentation
+/change-notes/
+
 ARCHITECTURE.md 
 instructions.md
+README#2.md

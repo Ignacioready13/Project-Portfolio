@@ -39,20 +39,20 @@ def extract_tabs():
         src = f.read()
 
     # Grid-type projects carry their text in the `items` array in content.js,
-    # not in a markdown file, so their tab should not get a markdown
-    # placeholder or a PROJECT_TEXT entry.
-    grid_tabs = set()
-    for gm in re.finditer(r'type\s*:\s*"grid"', src):
+    # and the Homepage is generated from the other projects, so neither gets a
+    # markdown placeholder or a PROJECT_TEXT entry.
+    no_text_tabs = set()
+    for gm in re.finditer(r'type\s*:\s*"(?:grid|home)"', src):
         tail = src[gm.end():]
         end = tail.find('}')
         if end == -1:
             continue
         m = re.search(r'tab\s*:\s*"([^"]*)"', tail[:end])
         if m:
-            grid_tabs.add(m.group(1))
+            no_text_tabs.add(m.group(1))
 
     tabs = re.findall(r'^\s*tab\s*:\s*"([^"]*)"', src, re.MULTILINE)
-    return [t for t in tabs if t not in grid_tabs]
+    return [t for t in tabs if t not in no_text_tabs]
 
 
 # ------------------------ minimal markdown -> HTML ------------------------

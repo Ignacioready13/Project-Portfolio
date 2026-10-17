@@ -31,12 +31,27 @@
                 Put files in a folder under media/ and point src to it, e.g.
                 "media/my-project/photo.jpg".
 
+     thumb    : optional. The "cover" used for this project's tile on the
+                Homepage. Any gallery item can be used (it does NOT have to be
+                the first one). Shape:
+                  { type: "image" | "video", src: "...", position?: "center 80%" }
+                Videos in tiles autoplay muted on an infinite loop with no
+                controls, and are cropped to fill the square tile. `position`
+                is an optional CSS object-position value that chooses which
+                part of the media stays visible when cropped (default
+                "center"). If `thumb` is omitted, the first gallery item is
+                used; if there is no media at all, a typographic tile is shown.
+
      type     : optional. Set the "type" field to "grid" to render this panel
                 as a card grid of smaller projects (no carousel or summary
                 text). Grid projects fill in `items` below and omit gallery
                 and skills.
+                Set type: "home" (first project only) for the Homepage tab,
+                which automatically grids every other project.
      items    : for grid projects only. List of small-project cards, each with:
-                  { title, image, text, skills?, github? }
+                  { title, image?, video?, position?, text, skills?, github? }
+                `video` (mp4) takes precedence over `image`; both are
+                cropped to fill the card and videos loop like GIFs.
 
    IMPORTANT: images must be JPG/PNG/WebP (NOT .HEIC), and videos must be
    .mp4 (ideally small and with no audio track). See README.md for how to
@@ -46,6 +61,19 @@
 const PROJECTS = [
 
   /* =====================================================================
+     PROJECT 0 — Homepage
+     ---------------------------------------------------------------------
+     Always keep this first. It renders automatically: every other project
+     (apart from the grid) appears under "Projects", and the grid project's
+     cards appear under "Mini-projects". Thumbnails come from each project's
+     `thumb` field.
+     ===================================================================== */
+  {
+    type: "home",
+    tab: "Homepage"
+  },
+
+  /* =====================================================================
      PROJECT 1 — Tactile racing game
      ===================================================================== */
   {
@@ -53,6 +81,8 @@ const PROJECTS = [
     title: "Two-player tactile stick-shift racing game",
     subtitle: "Engineering projects class at CU Boulder (August – November 2025)",
     github: "https://github.com/Ignacioready13/Mach-5",
+
+    thumb: { type: "image", src: "media/racing-game/full-view.jpg" },
 
     skills: ["Arduino", "C++", "Embedded systems"],
 
@@ -72,6 +102,9 @@ const PROJECTS = [
     title: "Guitar rewiring, modding, and restoration",
     subtitle: "Personal project",
 
+    // Tall vertical video; the tile crops to the glowing body.
+    thumb: { type: "video", src: "media/guitar/guitarWorkingVideo.mp4", position: "center 80%" },
+
     skills: ["#"],
 
     gallery: [
@@ -82,6 +115,22 @@ const PROJECTS = [
       { type: "image", src: "media/guitar/guitarWiringClean.png",  caption: "" }
     ]
   },
+    /* =====================================================================
+     PROJECT idk — neural game engine
+     ===================================================================== */
+  {
+    tab: "Neural game engine",
+    title: "Neural game engine",
+    github: "https://github.com/Ignacioready13/Neural-Game-Engine",
+    skills: ["#"],
+
+    thumb: { type: "video", src: "media/neuralGameEngine/demo.mp4" },
+
+    gallery: [
+      { type: "video", src: "media/neuralGameEngine/demo.mp4", caption: "Model flow96e." },
+
+    ]
+  },
 
  /* =====================================================================
      PROJECT 3 - SDR mount
@@ -90,6 +139,8 @@ const PROJECTS = [
     tab: "SDR mount",
     title: "Compact phone and SDR hardware module",
     subtitle: "For RF lab",
+
+    thumb: { type: "image", src: "media/mount/mountCadViewTwo.png" },
 
     skills: ["#"],
 
@@ -107,6 +158,8 @@ const PROJECTS = [
     title: "TDOA, NLLS",
     subtitle: "For lab",
 
+    // `thumb: null` shows a typographic tile until real media is added.
+    thumb: null,
     skills: ["#"],
 
     gallery: [
@@ -122,6 +175,9 @@ const PROJECTS = [
     tab: "Video game",
     title: "Video game made in Roblox",
     subtitle: "",
+
+    // The recording is a wide Roblox Studio capture; crop to the in-game screen.
+    thumb: { type: "video", src: "media/roblox/new.mp4", position: "30% center" },
 
     skills: ["#"],
 
@@ -141,22 +197,22 @@ const PROJECTS = [
     github: "https://github.com/Ignacioready13/VEX-OverUnder-2654H",
     skills: ["#"],
 
-    
+    // No media yet: the Homepage shows a typographic tile for this project.
   },
 
   /* =====================================================================
-     PROJECT 7 — More projects (grid)
+     PROJECT 7 — Mini-projects (grid)
      ---------------------------------------------------------------------
      A "grid" project renders as a card grid instead of a carousel. Each
-     card is { title, image, text, skills?, github? }. The cards below are
-     EXAMPLES — replace them with your real smaller projects (or delete the
-     extra examples).
+     card is { title, image?, video?, position?, text, skills?, github? }.
+     These cards also appear on the Homepage under "Mini-projects"; clicking
+     one there jumps to this tab and highlights the matching card.
      ===================================================================== */
 
   {
     type: "grid",
-    tab: "More projects",
-    title: "More projects",
+    tab: "Mini-projects",
+    title: "Mini-projects",
     subtitle: "Smaller projects and experiments, in brief.",
 
     items: [
