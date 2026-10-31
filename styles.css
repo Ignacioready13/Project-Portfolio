@@ -208,6 +208,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .panel.active { animation: none; }
   .home-tile { transition: none; }
+  .focus-view,
+  .focus-card { animation: none; }
+  .card-frame { transition: none; }
   .card-highlight {
     animation: none;
     border-color: var(--accent);
@@ -593,6 +596,7 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: box-shadow 0.15s ease;
+  cursor: pointer;
 }
 
 .card:hover { box-shadow: var(--shadow-md); }
@@ -604,9 +608,81 @@ body {
   cursor: zoom-in;
 }
 
+.card-media-box {
+  position: relative;
+}
+
 .card-media .thumb {
   height: 100%;
   aspect-ratio: auto;
+}
+
+/* One frame per media item; only the active frame is visible. */
+.card-frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  pointer-events: none;
+}
+
+.card-frame.active { opacity: 1; }
+
+.card-frame .thumb {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.card-gallery-btn,
+.focus-gallery-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(16, 24, 40, 0.3);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  z-index: 3;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.card-gallery-btn.prev { left: 8px; }
+.card-gallery-btn.next { right: 8px; }
+
+.card-gallery-btn:hover,
+.focus-gallery-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.card-gallery-btn:focus-visible,
+.focus-gallery-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.card-count,
+.focus-count {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: rgba(16, 24, 40, 0.62);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .card-media:focus-visible {
@@ -708,6 +784,222 @@ body {
   outline-offset: 2px;
   border-radius: 3px;
 }
+
+/* --------------------------- focus view ---------------------------- */
+/* A mini-project card, enlarged over a dimmed backdrop: same layout as the
+   tile (media, title, text, chips) with the gallery arrows still available. */
+.focus-view {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 24, 39, 0.66);
+  animation: lightboxFade 0.18s ease;
+}
+
+.focus-card {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: min(88vh, 900px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 60px rgba(16, 24, 40, 0.32);
+  cursor: default;
+  animation: focusCardIn 0.2s ease;
+}
+
+.focus-card:focus { outline: none; }
+
+@keyframes focusCardIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.focus-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #eef0f3;
+  border-bottom: 1px solid var(--border);
+}
+
+.focus-frame {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.focus-frame.active { display: flex; }
+
+.focus-frame img,
+.focus-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #eef0f3;
+}
+
+.focus-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(16, 24, 40, 0.3);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  z-index: 4;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.focus-close:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.focus-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.focus-gallery-btn.prev { left: 10px; }
+.focus-gallery-btn.next { right: 10px; }
+
+.focus-count {
+  right: 10px;
+  bottom: 10px;
+  font-size: 0.75rem;
+}
+
+.focus-caption {
+  margin: 0;
+  padding: 10px 18px 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+.focus-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 18px;
+}
+
+.focus-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.focus-text {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.focus-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------------------------- downloads ---------------------------- */
+.downloads {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.download-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.download-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.download-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.download-preview {
+  flex: none;
+  width: 190px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #eef0f3;
+}
+
+.download-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.download-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.download-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.download-meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.download-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.download-cta svg { display: block; }
+
+.download-card:hover .download-cta { color: var(--accent-hover); }
 
 /* ----------------------------- lightbox ----------------------------- */
 .lightbox {
@@ -816,4 +1108,18 @@ body {
   .tab-home { margin-right: 0; }
   .tab-home::after { display: none; }
   .home-tile-caption { font-size: 0.8rem; padding: 8px 9px; }
+
+  .card-gallery-btn { width: 26px; height: 26px; }
+  .focus-view { padding: 12px; }
+  .focus-card { max-height: 92vh; }
+  .focus-media { aspect-ratio: 4 / 3; }
+  .focus-title { font-size: 1.1rem; }
+  .focus-text { font-size: 0.94rem; }
+  .focus-caption { padding: 8px 14px 0; font-size: 0.84rem; }
+  .focus-body { padding: 14px 14px 16px; }
+
+  .download-card { gap: 12px; padding: 10px; }
+  .download-preview { width: 104px; }
+  .download-title { font-size: 0.94rem; }
+  .download-meta { font-size: 0.8rem; }
 }

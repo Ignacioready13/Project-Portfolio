@@ -49,9 +49,18 @@
                 Set type: "home" (first project only) for the Homepage tab,
                 which automatically grids every other project.
      items    : for grid projects only. List of small-project cards, each with:
-                  { title, image?, video?, position?, text, skills?, github? }
-                `video` (mp4) takes precedence over `image`; both are
-                cropped to fill the card and videos loop like GIFs.
+                  { title, media?, text, skills?, github? }
+                `media` is a list of images/videos shown in that card with
+                left/right gallery arrows (arrows are hidden when there is
+                only one item); it also accepts the older single
+                `image` / `video` / `position` fields. The card media is
+                cropped to fill; clicking anywhere on a card opens it in a
+                larger, focused view with the full media, text and chips.
+     downloads: optional. Files offered at the very bottom of a project page,
+                each shown as a card with a small preview image:
+                  { label, href, preview?, meta?, cta? }
+                `href` gets the HTML `download` attribute, so clicking saves
+                the file instead of opening it.
 
    IMPORTANT: images must be JPG/PNG/WebP (NOT .HEIC), and videos must be
    .mp4 (ideally small and with no audio track). See README.md for how to
@@ -109,10 +118,11 @@ const PROJECTS = [
 
     gallery: [
       { type: "video", src: "media/guitar/guitarWorkingVideo.mp4",       caption: "" },
-      { type: "image", src: "media/guitar/guitarBefore.png",       caption: "" },
-      { type: "image", src: "media/guitar/guitarTrace.png",       caption: "" },
       { type: "image", src: "media/guitar/guitarElectronics.jpg",  caption: "" },
-      { type: "image", src: "media/guitar/guitarWiringClean.png",  caption: "" }
+      { type: "image", src: "media/guitar/guitarWiringClean.png",  caption: "" },
+      { type: "image", src: "media/guitar/guitarBefore.png",       caption: "" },
+      { type: "image", src: "media/guitar/guitarTrace.png",       caption: "" }
+      
     ]
   },
     /* =====================================================================
@@ -133,62 +143,32 @@ const PROJECTS = [
   },
 
  /* =====================================================================
-     PROJECT 3 - SDR mount
-     ===================================================================== */
-  {
-    tab: "SDR mount",
-    title: "Compact phone and SDR hardware module",
-    subtitle: "For RF lab",
-
-    thumb: { type: "image", src: "media/mount/mountCadViewTwo.png" },
-
-    skills: ["#"],
-
-    gallery: [
-      { type: "image", src: "media/mount/mountCadViewOne.png", caption: "Placeholder image one." },
-      { type: "image", src: "media/mount/mountCadViewTwo.png", caption: "Placeholder image two." },
-      { type: "image", src: "media/mount/mount_2phones.jpg", caption: "Placeholder image three." }
-    ]
-  },
-  /* =====================================================================
-     PROJECT 4 — RF Research
+     PROJECT 3 — RF Research
      ===================================================================== */
   {
     tab: "RF research",
-    title: "TDOA, NLLS",
-    subtitle: "For lab",
+    title: "Satellite GPS-jamming simulations",
 
-    // `thumb: null` shows a typographic tile until real media is added.
-    thumb: null,
-    skills: ["#"],
-
-    gallery: [
-      { type: "image", src: "media/placeholders/placeholder-1.svg", caption: "Placeholder image one." },
-      { type: "image", src: "media/placeholders/placeholder-2.svg", caption: "Placeholder image two." },
-      { type: "image", src: "media/placeholders/placeholder-3.svg", caption: "Placeholder image three." }
-    ]
-  },
-  /* =====================================================================
-     PROJECT 5 — Video game
-     ===================================================================== */
-  {
-    tab: "Video game",
-    title: "Video game made in Roblox",
-    subtitle: "",
-
-    // The recording is a wide Roblox Studio capture; crop to the in-game screen.
-    thumb: { type: "video", src: "media/roblox/new.mp4", position: "30% center" },
+    thumb: { type: "video", src: "media/rf/nlls-3d-satellite-solve.mp4", position: "65% center" },
 
     skills: ["#"],
 
     gallery: [
-      { type: "video", src: "media/roblox/new.mp4", caption: "A Roblox ViewportFrame is usually meant to render a single 3d object; it was never meant to simulate an entire 3D world. By moving the player's character but leaving their camera in front of the Viewport, and linking their actions to a clone of their player rig within the Viewport environment, I can create an effect of a pixelated, scaled-down mini-world." },
-      { type: "image", src: "media/placeholders/placeholder-2.svg", caption: "Placeholder image two." },
-      { type: "image", src: "media/placeholders/placeholder-3.svg", caption: "Placeholder image three." }
+      { type: "video", src: "media/rf/nlls-3d-satellite-solve.mp4", caption: "Illustration of a 3D adaptation to a NLLS algorithm converging on a position solution (ignore the correlation marking)" },
+      { type: "image", src: "media/rf/tdoa-matching-poland.jpg", caption: "TDOA ephemeris-matching results: each satellite's own PRN code ranks as first candidate." }
+    ],
+
+    downloads: [
+      {
+        label: "TDOA / NLLS research presentation",
+        href: "media/rf/tdoa-research.pdf",
+        preview: "media/rf/tdoa-nlls-preview.jpg",
+        meta: "PDF · 33 slides · 4.2 MB"
+      }
     ]
   },
   /* =====================================================================
-     PROJECT 6 — placeholder
+     PROJECT 4 — VEX code
      ===================================================================== */
   {
     tab: "VEX code",
@@ -197,16 +177,22 @@ const PROJECTS = [
     github: "https://github.com/Ignacioready13/VEX-OverUnder-2654H",
     skills: ["#"],
 
-    // No media yet: the Homepage shows a typographic tile for this project.
+    thumb: { type: "video", src: "media/vex/auton-run-square.mp4" },
+
+    gallery: [
+      { type: "video", src: "media/vex/auton-run.mp4", caption: "One of my autonomous routines. No auton recorder or anything fancy." }
+    ]
   },
 
   /* =====================================================================
-     PROJECT 7 — Mini-projects (grid)
+     PROJECT 5 — Mini-projects (grid)
      ---------------------------------------------------------------------
      A "grid" project renders as a card grid instead of a carousel. Each
-     card is { title, image?, video?, position?, text, skills?, github? }.
-     These cards also appear on the Homepage under "Mini-projects"; clicking
-     one there jumps to this tab and highlights the matching card.
+     card is { title, media?, text, skills?, github? }; `media` is a list of
+     images/videos shown with gallery arrows, and clicking the card opens a
+     larger, focused copy of it. These cards also appear on the Homepage
+     under "Mini-projects"; clicking one there jumps to this tab and
+     highlights the matching card.
      ===================================================================== */
 
   {
@@ -218,12 +204,34 @@ const PROJECTS = [
     items: [
       {
         title: "Revived 3d printer",
-        image: "media/more/FrankensteinPrinter.png",
+        media: [
+          { type: "image", src: "media/more/FrankensteinPrinter.png" }
+        ],
         text: "Successfully revived dead 3D printer: debugged misbehaving extruder motor, swapped in mismatched Anet A8 board, reconfigured & re-flashed Marlin firmware to accommodate smaller axes & unheated bed.",
         //skills: ["Skill", "Skill", "Skill"]
         //github: "https://github.com/yourname/example-one"
+      },
+      {
+        title: "Compact phone & SDR mount",
+        media: [
+          { type: "image", src: "media/mount/mountCadViewTwo.png", caption: "The finished mount seen from the back, with the phone sitting under the antenna plate." },
+          { type: "image", src: "media/mount/mount_2phones.jpg", caption: "Two mounts in the lab, each holding a phone clamped shut with rubber bands." },
+          { type: "image", src: "media/mount/mountCadViewOne.png", caption: "CAD view of the clamp, its rubber-band hooks, and the phone it holds." }
+        ],
+        text: "A 3D-printed mount that holds an Android phone, an SDR transceiver, and a biconical UWB antenna together for field testing. The clamp keeps the phone shut with two rubber bands while the SDR velcros to the back. Designed in Onshape; it took a few iterations to get the clamps sliding smoothly without catching the bands."
+      },
+      {
+        title: "Roblox video game",
+        media: [
+          {
+            type: "video",
+            src: "media/roblox/new.mp4",
+            position: "30% center",
+            caption: "A Roblox ViewportFrame is usually meant to render a single 3d object; it was never meant to simulate an entire 3D world. By moving the player's character but leaving their camera in front of the Viewport, and linking their actions to a clone of their player rig within the Viewport environment, I can create an effect of a pixelated, scaled-down mini-world."
+          }
+        ],
+        text: "A Roblox game I worked on for a couple of years in high school. The clip shows a viewport trick: the player's character moves while the camera stays in front of the ViewportFrame, so a mirrored rig inside the viewport renders a pixelated, scaled-down mini-world instead of a single 3D object."
       }
-      
     ]
   }
 

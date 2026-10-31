@@ -62,7 +62,7 @@ const PROJECT_TEXT = {
     {
       "heading": "",
       "paragraphs": [
-        "<p>A first-person neural game engine styled after the Backrooms, fully implemented by DeepSeek and trained on a single NVIDIA 5070 laptop GPU.</p>"
+        "<p>A first-person neural game engine styled after the Backrooms, fully implemented by DeepSeek and trained on a single NVIDIA 5070 laptop GPU. <strong>Source code avaliable on GitHub.</strong></p>"
       ]
     },
     {
@@ -125,28 +125,31 @@ const PROJECT_TEXT = {
       ]
     }
   ],
-  "sdr-mount": [
-    {
-      "heading": "Compact phone and SDR transceiver module",
-      "paragraphs": [
-        "<p>A quick project for the RF lab-- I was tasked to design a portable, compact way to hold together an Android phone, SDR hardware, and a biconical ultra wideband antenna. My solution was this 3d-printed mount I designed in Onshape. The clamp, held shut with two rubber bands, holds the phone in place; the SDR transceiver mounts to the back with velcro strips. It took a few iterations to get the clamps to slide smoothly and keep the rubber bands out of the way.</p>"
-      ]
-    }
-  ],
   "rf-research": [
     {
-      "heading": "Placeholder Heading",
+      "heading": "",
       "paragraphs": [
-        "<p>Content coming soon.</p>"
+        "<p><strong>Please see the attached presentation at the bottom of this page for more detailed information.</strong></p>",
+        "<p>The RF &amp; SatNav lab has already written TDOA (time-delay of arrival) algorithms to pinpoint the 2d position of ground-based GPS jammers. They take the ‘dirty’ jammed GPS collections of multiple ‘nodes’ across Poland, line them up using the gps TOW collected from whatever clean GPS signals made it through to each, and extract TDOA from that.</p>",
+        "<p>Recently there has been concern that satellites could be used to jam GPS over huge geographic regions (much more extensive reach than a ground-based jammer, whose jamming quickly becomes out of range because of the curvature of the earth, terrain, etc).</p>",
+        "<p>My goal: to analyze the feasibility of various methods to convert my lab’s existing ground-based TDOA system into a space-jammer localization system.</p>"
       ]
-    }
-  ],
-  "video-game": [
+    },
     {
-      "heading": "Placeholder Heading",
+      "heading": "First method: NLLS",
       "paragraphs": [
-        "<p>A Roblox game I worked on for a couple years in high school.</p>",
-        "<p>More info to come.</p>"
+        "<p>My lab uses NLLS (Non Linear Least Squares) algorithms to actually find the geographic point that best satisfies all the TDOA measurements (which have inherent error). In principle, this can be extended to three dimensions.</p>",
+        "<p>I set up a simulation: given the locations of four closely situated nodes in Poland, and a theoretical jammer position I chose, I manually calculated the TDOA between each node pair and fed that into a modified NLLS algorithm to return a 3d position. As expected, the perfect TDOAs led to very accurate results; the algorithm very nearly found the jammer point I was simulating even for extremely high heights (0.1 - 50,000 meters above WGS84 ellipsoid).</p>",
+        "<p>This method started to fall apart once I injected random clock jitter error into the TDOA times I fed the NLLS. This, coupled with the fact that all the simulated nodes must be on the ground and thus have very poor vertical discretion (VDOP) quickly showed why this method doesn’t work as well for space-based jamming.</p>"
+      ]
+    },
+    {
+      "heading": "Second method: Catalog-based, ephemeris data TDOA matching",
+      "paragraphs": [
+        "<p>This method involves using broadcast ephemerides; if I know the position of every satellite at the moment the jamming happened, I can calculate a theoretical TDOA for each node-pair, for each satellite visible to the nodes in the sky, and see which set of theoretical TDOAs best matches those which were actually observed from the ground.</p>",
+        "<p>Using this method on actual clean GPS-band data from our nodes, I was able to pick a satellite visible to all nodes, calculate the TDOA of its PRN code as observed by the real nodes, and use that as the ‘observed TDOA’. Then, by calculating a theoretical set of TDOA pairs for each satellite from its known position (from the ephemerides), I verified that each satellite ranked as the most likely matched candidate for the TDOAs taken from its own PRN code.</p>",
+        "<p>Please note that I had assistance from AI in creating/modifying these algorithms.</p>",
+        "<p>There are also obvious limitations to this ephemerides-based approach; <strong>see the slide deck below for more info</strong>.</p>"
       ]
     }
   ],
@@ -154,7 +157,7 @@ const PROJECT_TEXT = {
     {
       "heading": "",
       "paragraphs": [
-        "<p>This is the code I developed for my VEX VRC robotics team during the 2023-2024 VEX game, “Over Under”.</p>"
+        "<p>This is the code I developed for my VEX VRC robotics team during the 2023-2024 VEX game, “Over Under”. <strong>Source code avaliable on GitHub.</strong></p>"
       ]
     },
     {

@@ -79,6 +79,23 @@
     return s;
   }
 
+  function svgDownload() {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', '16');
+    s.setAttribute('height', '16');
+    s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', 'currentColor');
+    p.setAttribute('stroke-width', '2');
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('d', 'M12 3v12M7 11l5 5 5-5M4 20h16');
+    s.appendChild(p);
+    return s;
+  }
+
   function svgHome() {
     var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     s.setAttribute('viewBox', '0 0 24 24');
@@ -152,9 +169,20 @@
   }
 
   function thumbForItem(item) {
+    if (Array.isArray(item.media) && item.media.length) return item.media[0];
     if (item.video) return { type: 'video', src: item.video, position: item.position };
     if (item.image) return { type: 'image', src: item.image, position: item.position };
     return null;
+  }
+
+  /* All media for a mini-project card. `media` (an array) wins; the older
+     single `image` / `video` fields still work. */
+  function mediaForItem(item) {
+    if (Array.isArray(item.media) && item.media.length) {
+      return item.media.filter(function (m) { return m && m.src; });
+    }
+    var thumb = thumbForItem(item);
+    return thumb ? [thumb] : [];
   }
 
   function initials(name) {
@@ -419,32 +447,310 @@
     return { open: open, close: close };
   }
 
+  /* --------------------------- focus view --------------------------- */
+  /* A mini-project card opens into a larger copy of itself: same media,
+     title, text and chips, just bigger, over a dimmed backdrop. The gallery
+     arrows stay available. Closes on the ✕, a backdrop click or Escape. */
+  function buildFocusView() {
+    var overlay = make('div', 'focus-view');
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Mini-project details');
+    overlay.hidden = true;
+
+    var panel = make('div', 'focus-card');
+    panel.setAttribute('tabindex', '-1');
+
+    var closeBtn = make('button', 'focus-close');
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.appendChild(svgClose());
+
+    var mediaWrap = make('div', 'focus-media');
+
+    var prev = make('button', 'focus-gallery-btn prev');
+    prev.type = 'button';
+    prev.setAttribute('aria-label', 'Previous media');
+    prev.appendChild(svgChevron('left'));
+
+    var next = make('button', 'focus-gallery-btn next');
+    next.type = 'button';
+    next.setAttribute('aria-label', 'Next media');
+    next.appendChild(svgChevron('right'));
+
+    var count = make('span', 'focus-count');
+    count.setAttribute('aria-hidden', 'true');
+
+    var caption = make('p', 'focus-caption');
+    caption.hidden = true;
+
+    var body = make('div', 'focus-body');
+    var title = make('h3', 'focus-title');
+    var text = make('p', 'focus-text');
+    var footer = make('div', 'focus-footer');
+
+    body.appendChild(title);
+    body.appendChild(text);
+    body.appendChild(footer);
+
+    mediaWrap.appendChild(prev);
+    mediaWrap.appendChild(next);
+    mediaWrap.appendChild(count);
+
+    panel.appendChild(closeBtn);
+    panel.appendChild(mediaWrap);
+    panel.appendChild(caption);
+    panel.appendChild(body);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    var media = [];
+    var frames = [];
+    var index = 0;
+    var lastFocus = null;
+    var resume = [];
+
+    function buildFrame(item) {
+      var frame = make('div', 'focus-frame');
+      if (item.type === 'video') {
+        var v = document.createElement('video');
+        v.setAttribute('controls', '');
+        v.setAttribute('loop', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('muted', '');
+        v.setAttribute('preload', 'metadata');
+        v.muted = true;
+        v.defaultMuted = true;
+        v.src = item.src;
+        frame.appendChild(v);
+      } else {
+        var img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.caption || '';
+        frame.appendChild(img);
+      }
+      return frame;
+    }
+
+    function playIn(frame) {
+      var v = frame.querySelector('video');
+      if (!v) return;
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+
+    function go(i) {
+      if (!media.length) return;
+      index = (i + media.length) % media.length;
+      frames.forEach(function (f, n) {
+        var active = n === index;
+        f.classList.toggle('active', active);
+        var v = f.querySelector('video');
+        if (v) {
+          if (active) playIn(f); else v.pause();
+        }
+      });
+      var item = media[index] || {};
+      caption.textContent = item.caption || '';
+      caption.hidden = !item.caption;
+      count.textContent = (index + 1) + ' / ' + media.length;
+      var multi = media.length > 1;
+      prev.hidden = !multi;
+      next.hidden = !multi;
+      count.hidden = !multi;
+    }
+
+    function clear() {
+      frames.forEach(function (f) {
+        var v = f.querySelector('video');
+        if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
+        f.remove();
+      });
+      frames = [];
+      media = [];
+    }
+
+    function open(item, list, startIndex, card) {
+      clear();
+      lastFocus = document.activeElement;
+      media = (list || []).slice();
+
+      frames = media.map(function (m) {
+        var f = buildFrame(m);
+        mediaWrap.appendChild(f);
+        return f;
+      });
+
+      title.textContent = item.title || '';
+      text.textContent = item.text || '';
+      text.hidden = !item.text;
+
+      footer.textContent = '';
+      if (item.skills && item.skills.length) {
+        var skillsWrap = make('div', 'card-skills');
+        item.skills.forEach(function (s) { skillsWrap.appendChild(make('span', 'chip', s)); });
+        footer.appendChild(skillsWrap);
+      }
+      if (item.github) {
+        var link = make('a', 'card-link', 'View on GitHub');
+        link.href = item.github;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        footer.appendChild(link);
+      }
+      footer.hidden = footer.childNodes.length === 0;
+
+      // Pause whatever was playing in the tile behind the overlay.
+      resume = [];
+      if (card) {
+        Array.prototype.slice.call(card.querySelectorAll('video')).forEach(function (v) {
+          if (!v.paused) { resume.push(v); v.pause(); }
+        });
+      }
+
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      panel.scrollTop = 0;
+      go(typeof startIndex === 'number' ? startIndex : 0);
+      panel.focus();
+    }
+
+    function close() {
+      if (overlay.hidden) return;
+      overlay.hidden = true;
+      document.body.style.overflow = '';
+      clear();
+      resume.forEach(function (v) {
+        if (prefersReducedMotion()) return;
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      });
+      resume = [];
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+      lastFocus = null;
+    }
+
+    prev.addEventListener('click', function () { go(index - 1); });
+    next.addEventListener('click', function () { go(index + 1); });
+    closeBtn.addEventListener('click', close);
+
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (overlay.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); close(); }
+      else if (e.key === 'ArrowLeft' && media.length > 1) { e.preventDefault(); go(index - 1); }
+      else if (e.key === 'ArrowRight' && media.length > 1) { e.preventDefault(); go(index + 1); }
+    });
+
+    return { open: open, close: close };
+  }
+
   /* --------------------------- card grid ---------------------------- */
   function buildGrid(proj, panelIndex) {
     var grid = make('div', 'card-grid');
     (proj.items || []).forEach(function (item, itemIndex) {
+      var media = mediaForItem(item);
+      var current = 0;
+
       var card = make('article', 'card');
       card.id = 'card-' + panelIndex + '-' + itemIndex;
+
+      // The whole card opens the focused view; only the gallery arrows and
+      // links inside the card keep their own behavior.
+      card.addEventListener('click', function (e) {
+        if (e.target.closest('a, button')) return;
+        openFocused();
+      });
+
+      var mediaBox = make('div', 'card-media-box');
 
       var mediaWrap = make('div', 'card-media');
       mediaWrap.setAttribute('role', 'button');
       mediaWrap.setAttribute('tabindex', '0');
-      mediaWrap.setAttribute('aria-label', 'Enlarge ' + (item.title || 'image'));
-      mediaWrap.appendChild(buildThumb(thumbForItem(item)));
+      mediaWrap.setAttribute('aria-label', 'Open ' + (item.title || 'project'));
+      mediaBox.appendChild(mediaWrap);
+
+      var frames = media.map(function (m) {
+        var frame = make('div', 'card-frame');
+        frame.appendChild(buildThumb(m));
+        mediaWrap.appendChild(frame);
+        return frame;
+      });
+
+      var countEl = null;
+
+      function go(i) {
+        if (!media.length) return;
+        current = (i + media.length) % media.length;
+        frames.forEach(function (frame, n) {
+          var active = n === current;
+          frame.classList.toggle('active', active);
+          var v = frame.querySelector('video');
+          if (!v) return;
+          if (active && !prefersReducedMotion()) {
+            var p = v.play();
+            if (p && p.catch) p.catch(function () {});
+          } else {
+            v.pause();
+          }
+        });
+        if (countEl) countEl.textContent = (current + 1) + ' / ' + media.length;
+      }
+
+      if (media.length > 1) {
+        var prev = make('button', 'card-gallery-btn prev');
+        prev.type = 'button';
+        prev.setAttribute('aria-label', 'Previous media');
+        prev.appendChild(svgChevron('left'));
+        prev.addEventListener('click', function (e) {
+          e.stopPropagation();
+          go(current - 1);
+        });
+
+        var next = make('button', 'card-gallery-btn next');
+        next.type = 'button';
+        next.setAttribute('aria-label', 'Next media');
+        next.appendChild(svgChevron('right'));
+        next.addEventListener('click', function (e) {
+          e.stopPropagation();
+          go(current + 1);
+        });
+
+        countEl = make('span', 'card-count');
+        countEl.setAttribute('aria-hidden', 'true');
+        mediaBox.appendChild(prev);
+        mediaBox.appendChild(next);
+        mediaBox.appendChild(countEl);
+      }
+
       var icon = make('span', 'card-media-icon');
       icon.setAttribute('aria-hidden', 'true');
       icon.appendChild(svgExpand());
       mediaWrap.appendChild(icon);
-      var openCard = function () {
-        var thumb = thumbForItem(item);
-        if (!thumb) return;
-        lightbox.open({ type: thumb.type, src: thumb.src, caption: item.title }, null);
-      };
-      mediaWrap.addEventListener('click', openCard);
+
+      function openFocused() {
+        if (!media.length) return;
+        focusView.open(item, media, current, card);
+      }
+
       mediaWrap.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCard(); }
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openFocused();
+        } else if (media.length > 1 && e.key === 'ArrowLeft') {
+          e.preventDefault();
+          go(current - 1);
+        } else if (media.length > 1 && e.key === 'ArrowRight') {
+          e.preventDefault();
+          go(current + 1);
+        }
       });
-      card.appendChild(mediaWrap);
+
+      card.appendChild(mediaBox);
+      go(0);
 
       var body = make('div', 'card-body');
       body.appendChild(make('h3', 'card-title', item.title || ''));
@@ -476,6 +782,40 @@
       grid.appendChild(card);
     });
     return grid;
+  }
+
+  /* --------------------------- downloads ---------------------------- */
+  /* A downloadable file rendered as a card with a small preview image. */
+  function buildDownloads(list) {
+    var wrap = make('div', 'downloads');
+    list.forEach(function (d) {
+      var link = make('a', 'download-card');
+      link.href = d.href;
+      link.setAttribute('download', '');
+      link.setAttribute('aria-label', 'Download ' + (d.label || d.href));
+
+      var preview = make('div', 'download-preview');
+      if (d.preview) {
+        var img = document.createElement('img');
+        img.src = d.preview;
+        img.alt = '';
+        img.loading = 'lazy';
+        preview.appendChild(img);
+      }
+      link.appendChild(preview);
+
+      var body = make('div', 'download-body');
+      body.appendChild(make('span', 'download-title', d.label || 'Download'));
+      if (d.meta) body.appendChild(make('span', 'download-meta', d.meta));
+      var cta = make('span', 'download-cta');
+      cta.appendChild(svgDownload());
+      cta.appendChild(make('span', null, d.cta || 'Download'));
+      body.appendChild(cta);
+      link.appendChild(body);
+
+      wrap.appendChild(link);
+    });
+    return wrap;
   }
 
   /* ---------------------------- homepage ---------------------------- */
@@ -606,6 +946,11 @@
         panel.appendChild(skillsWrap);
       }
 
+      if (proj.downloads && proj.downloads.length) {
+        panel.appendChild(make('div', 'section-label', 'Download'));
+        panel.appendChild(buildDownloads(proj.downloads));
+      }
+
       panelsEl.appendChild(panel);
     });
   }
@@ -625,6 +970,9 @@
         else if (c.pause) c.pause();
       });
       p.querySelectorAll('.thumb-video').forEach(function (v) {
+        // Only the frame that is showing should play in a card gallery.
+        var frame = v.closest('.card-frame');
+        if (frame && !frame.classList.contains('active')) return;
         if (active && !prefersReducedMotion()) {
           var playing = v.play();
           if (playing && playing.catch) playing.catch(function () {});
@@ -665,6 +1013,7 @@
 
   /* ----------------------------- init ------------------------------- */
   var lightbox = buildLightbox();
+  var focusView = buildFocusView();
   buildTabs();
   buildPanels();
   switchTab(0);
