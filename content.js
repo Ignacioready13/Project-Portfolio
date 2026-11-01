@@ -214,11 +214,11 @@ const PROJECTS = [
       {
         title: "Compact phone & SDR mount",
         media: [
-          { type: "image", src: "media/mount/mountCadViewTwo.png", caption: "The finished mount seen from the back, with the phone sitting under the antenna plate." },
-          { type: "image", src: "media/mount/mount_2phones.jpg", caption: "Two mounts in the lab, each holding a phone clamped shut with rubber bands." },
-          { type: "image", src: "media/mount/mountCadViewOne.png", caption: "CAD view of the clamp, its rubber-band hooks, and the phone it holds." }
+          { type: "image", src: "media/mount/mountCadViewTwo.png", caption: "The phone mount as seen from the back; empty cavity for SDR frontend facing up, with hooks available to secure SDR with Velcro." },
+          { type: "image", src: "media/mount/mount_2phones.jpg", caption: "Two 3d-printed mounts in the lab; each module holds together a phone, an SDR frontend and a UWB antenna." },
+          { type: "image", src: "media/mount/mountCadViewOne.png", caption: "View of the adjustable clamp mechanism." }
         ],
-        text: "A 3D-printed mount that holds an Android phone, an SDR transceiver, and a biconical UWB antenna together for field testing. The clamp keeps the phone shut with two rubber bands while the SDR velcros to the back. Designed in Onshape; it took a few iterations to get the clamps sliding smoothly without catching the bands."
+        text: "A 3D-printed mount that holds an Android phone, an SDR transceiver, and a biconical UWB antenna together for field testing. The clamp is held shut on the phone with rubber bands, while the SDR velcros to the back. Designed in Onshape."
       },
       {
         title: "Roblox video game",
