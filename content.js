@@ -103,42 +103,21 @@ const PROJECTS = [
       { type: "image", src: "media/racing-game/wiring-closeup.jpg",  caption: "Our prototype needed a second breadboard to keep the LEDs visible." }
     ]
   },
+
    /* =====================================================================
-     PROJECT 2 — guitar
+     PROJECT idk — Calculator on FPGA
      ===================================================================== */
   {
-    tab: "Guitar restoration",
-    title: "Guitar rewiring, modding, and restoration",
-    subtitle: "Personal project",
+    tab: "Calculator on FPGA",
+    title: "Four-operation calculator for FPGA (SystemVerilog)",
+    github: "https://github.com/Ignacioready13/Calculator",
+    skills: ["SystemVerilog", "FPGA", "Vivado", "Digital Logic"],
 
-    // Tall vertical video; the tile crops to the glowing body.
-    thumb: { type: "video", src: "media/guitar/guitarWorkingVideo.mp4", position: "center 80%" },
-
-    skills: ["#"],
-
+    thumb: { type: "video", src: "media/calculator/calculatorShort.mp4" },
+    
     gallery: [
-      { type: "video", src: "media/guitar/guitarWorkingVideo.mp4",       caption: "" },
-      { type: "image", src: "media/guitar/guitarElectronics.jpg",  caption: "" },
-      { type: "image", src: "media/guitar/guitarWiringClean.png",  caption: "" },
-      { type: "image", src: "media/guitar/guitarBefore.png",       caption: "" },
-      { type: "image", src: "media/guitar/guitarTrace.png",       caption: "" }
-      
-    ]
-  },
-    /* =====================================================================
-     PROJECT idk — neural game engine
-     ===================================================================== */
-  {
-    tab: "Neural game engine",
-    title: "Neural game engine",
-    github: "https://github.com/Ignacioready13/Neural-Game-Engine",
-    skills: ["#"],
-
-    thumb: { type: "video", src: "media/neuralGameEngine/demo.mp4" },
-
-    gallery: [
-      { type: "video", src: "media/neuralGameEngine/demo.mp4", caption: "Model flow96e." },
-
+      { type: "video", src: "media/calculator/calculatorFull.mp4", caption: "My calculator code on a Boolean Board (Spartan-7 FPGA), showcasing four basic math operations." },
+      { type: "image", src: "media/calculator/IO_diagram.jpg", caption: "IO diagram showing the 5 modules."}
     ]
   },
 
@@ -181,6 +160,44 @@ const PROJECTS = [
 
     gallery: [
       { type: "video", src: "media/vex/auton-run.mp4", caption: "One of my autonomous routines. No auton recorder or anything fancy." }
+    ]
+  },
+   /* =====================================================================
+     PROJECT idk — neural game engine
+     ===================================================================== */
+  {
+    tab: "Neural game engine",
+    title: "Neural game engine",
+    github: "https://github.com/Ignacioready13/Neural-Game-Engine",
+    skills: ["#"],
+
+    thumb: { type: "video", src: "media/neuralGameEngine/demo.mp4" },
+
+    gallery: [
+      { type: "video", src: "media/neuralGameEngine/demo.mp4", caption: "Model flow96e." },
+
+    ]
+  },
+  /* =====================================================================
+     PROJECT — guitar
+     ===================================================================== */
+  {
+    tab: "Guitar restoration",
+    title: "Guitar rewiring, modding, and restoration",
+    subtitle: "Personal project",
+
+    // Tall vertical video; the tile crops to the glowing body.
+    thumb: { type: "video", src: "media/guitar/guitarWorkingVideo.mp4", position: "center 80%" },
+
+    skills: ["#"],
+
+    gallery: [
+      { type: "video", src: "media/guitar/guitarWorkingVideo.mp4",       caption: "" },
+      { type: "image", src: "media/guitar/guitarElectronics.jpg",  caption: "" },
+      { type: "image", src: "media/guitar/guitarWiringClean.png",  caption: "" },
+      { type: "image", src: "media/guitar/guitarBefore.png",       caption: "" },
+      { type: "image", src: "media/guitar/guitarTrace.png",       caption: "" }
+      
     ]
   },
 

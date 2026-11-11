@@ -28,33 +28,65 @@ const PROJECT_TEXT = {
       ]
     }
   ],
-  "guitar-restoration": [
+  "calculator-on-fpga": [
+    {
+      "heading": "Four-operation calculator for FPGA (SystemVerilog)",
+      "paragraphs": [
+        "<p>A four-operation calculator I built with SystemVerilog for the Spartan-7 FPGA on the Boolean Board. I built it as part of my Digital Logic class; the professor told us the basic purpose of each block but all the implementation and code is my own. The code is on GitHub.</p>",
+        "<p>There are five main modules:</p>",
+        "<ul><li>Controller (controller.sv)</li><li>7-segment display output (OutputBlock.sv)</li><li>Keypad input (keypad.sv)</li><li>Memory (Memory.sv)</li><li>ALU (ALU.sv)</li></ul>",
+        "<p>Additionally there is the toplevel module: calculator.sv.</p>",
+        "<p>I've successfully synthesized this project in Vivado and used it on an actual FPGA (the Boolean Board).</p>"
+      ]
+    }
+  ],
+  "rf-research": [
     {
       "heading": "",
       "paragraphs": [
-        "<p>During my senior year of high school, some family friends gave me a very broken electric guitar. The headstock was cracked clean in half. The pickguard was shattered and dirty. And it didn’t make any noise at all.</p>",
-        "<p>Upon further research, it was briefly made sometime in the 1960s by a now-defunct company, and had no documentation whatsoever. It really seemed like a lost cause. I took off the pickguard and cleaned everything up; after spending increasingly long hours admiring its components, I figured I might as well just fix it.</p>"
+        "<p><strong>Please see the attached presentation at the bottom of this page for more detailed information.</strong></p>",
+        "<p>The RF &amp; SatNav lab has already written TDOA (time-delay of arrival) algorithms to pinpoint the 2d position of ground-based GPS jammers. They take the ‘dirty’ jammed GPS collections of multiple ‘nodes’ across Poland, line them up using the gps TOW collected from whatever clean GPS signals made it through to each, and extract TDOA from that.</p>",
+        "<p>Recently there has been concern that satellites could be used to jam GPS over huge geographic regions (much more extensive reach than a ground-based jammer, whose jamming quickly becomes out of range because of the curvature of the earth, terrain, etc).</p>",
+        "<p>My goal: to analyze the feasibility of various methods to convert my lab’s existing ground-based TDOA system into a space-jammer localization system.</p>"
       ]
     },
     {
-      "heading": "Wiring",
+      "heading": "First method: NLLS",
       "paragraphs": [
-        "<p>I spent lots of hours fiddling with different configurations of the tone circuitry. With an MP3 player hooked up to where the pickups should be, I was able to play with various filter and volume knob configurations. I decided on buying an “orange drop” low-pass filter. The original potentiometers turned out to be functional after some internal cleaning.</p>"
+        "<p>My lab uses NLLS (Non Linear Least Squares) algorithms to actually find the geographic point that best satisfies all the TDOA measurements (which have inherent error). In principle, this can be extended to three dimensions.</p>",
+        "<p>I set up a simulation: given the locations of four closely situated nodes in Poland, and a theoretical jammer position I chose, I manually calculated the TDOA between each node pair and fed that into a modified NLLS algorithm to return a 3d position. As expected, the perfect TDOAs led to very accurate results; the algorithm very nearly found the jammer point I was simulating even for extremely high heights (0.1 - 50,000 meters above WGS84 ellipsoid).</p>",
+        "<p>This method started to fall apart once I injected random clock jitter error into the TDOA times I fed the NLLS. This, coupled with the fact that all the simulated nodes must be on the ground and thus have very poor vertical discretion (VDOP) quickly showed why this method doesn’t work as well for space-based jamming.</p>"
       ]
     },
     {
-      "heading": "Pickguard",
+      "heading": "Second method: Catalog-based, ephemeris data TDOA matching",
       "paragraphs": [
-        "<p>(The pickguard is the name for the plastic plate that protects the wood face of the guitar). I thought I was done with the guitar after I’d redone the wiring; I put a bit of superglue on the original pickguard and called it good. It only took one jam session to re-break it by pulling instrument cable out at a funny angle.</p>",
-        "<p>I took off the broken pickguard, put it together one last time, and put it through my school’s industrial photocopier. After using Fusion 360 to trace and scale it, I laser cut a new one out of clear acrylic and used a dremel to scuff some pretty patterns into it. Having a clear pickguard is unusual, and leads to some interesting possibilities…</p>"
+        "<p>This method involves using broadcast ephemerides; if I know the position of every satellite at the moment the jamming happened, I can calculate a theoretical TDOA for each node-pair, for each satellite visible to the nodes in the sky, and see which set of theoretical TDOAs best matches those which were actually observed from the ground.</p>",
+        "<p>Using this method on actual clean GPS-band data from our nodes, I was able to pick a satellite visible to all nodes, calculate the TDOA of its PRN code as observed by the real nodes, and use that as the ‘observed TDOA’. Then, by calculating a theoretical set of TDOA pairs for each satellite from its known position (from the ephemerides), I verified that each satellite ranked as the most likely matched candidate for the TDOAs taken from its own PRN code.</p>",
+        "<p>Please note that I had assistance from AI in creating/modifying these algorithms.</p>",
+        "<p>There are also obvious limitations to this ephemerides-based approach; <strong>see the slide deck below for more info</strong>.</p>"
+      ]
+    }
+  ],
+  "vex-code": [
+    {
+      "heading": "",
+      "paragraphs": [
+        "<p>This is the code I developed for my VEX VRC robotics team during the 2023-2024 VEX game, “Over Under”. <strong>Source code avaliable on GitHub.</strong></p>"
       ]
     },
     {
-      "heading": "Lighting",
+      "heading": "Autonomous recorder",
       "paragraphs": [
-        "<p>I installed a strip of neopixels into the electronics cavity of the wood, and wired them to the D+, power, and ground of a USB-C port which I mounted in the pickguard. I chose to keep all circuitry out of the guitar; anytime I want to change the lighting control, I don’t need to take the guitar apart. The guitar simply houses the lights themselves and no more.</p>",
-        "<p>As for the external lighting controller: an Adafruit Feather M0 sends a lighting signal to a logic level shifter, which passes it on through the USB C cable. Instead of buying new parts, I reused a broken LG phone I had: the LG’s battery is perfect for powering the Neopixels for hours on end, and I repurposed the LG itself to charge its own old battery so I wouldn’t need to create a separate charging circuit.</p>",
-        "<p>Finally, I use the FastLED library to program whatever lighting effects I desire, and connect my phone to the Feather over Bluetooth to command it to switch between stored effects.</p>"
+        "<p>Stores the position of the left joystick, right joystick, and intake/outtake button to the SD card every 20ms; allows the user to select a recording to play back. That way, our team’s driver could record himself actually driving for 15 seconds, and we could replay the recording during the autonomous period of real competitions.</p>"
+      ]
+    },
+    {
+      "heading": "Autonomous code",
+      "paragraphs": [
+        "<p>Features:</p>",
+        "<ul><li>Simple PID function to smoothly drive a specified distance and avoid overshooting.</li><li>Function that uses feedback from gyroscope to rotate in place a specific number of degrees.</li><li>”Asymmetric driving” function to move the robot in a curve or spline: set chassis left and right side power independently.</li></ul>",
+        "<p><strong>Please note:</strong> I was in high school when I wrote this, so it’s not perfect. I cleaned up some comments and variable names in 2026, and fixed a couple of the obvious bugs, but there may be bugs I never caught!</p>"
       ]
     }
   ],
@@ -125,53 +157,33 @@ const PROJECT_TEXT = {
       ]
     }
   ],
-  "rf-research": [
+  "guitar-restoration": [
     {
       "heading": "",
       "paragraphs": [
-        "<p><strong>Please see the attached presentation at the bottom of this page for more detailed information.</strong></p>",
-        "<p>The RF &amp; SatNav lab has already written TDOA (time-delay of arrival) algorithms to pinpoint the 2d position of ground-based GPS jammers. They take the ‘dirty’ jammed GPS collections of multiple ‘nodes’ across Poland, line them up using the gps TOW collected from whatever clean GPS signals made it through to each, and extract TDOA from that.</p>",
-        "<p>Recently there has been concern that satellites could be used to jam GPS over huge geographic regions (much more extensive reach than a ground-based jammer, whose jamming quickly becomes out of range because of the curvature of the earth, terrain, etc).</p>",
-        "<p>My goal: to analyze the feasibility of various methods to convert my lab’s existing ground-based TDOA system into a space-jammer localization system.</p>"
+        "<p>During my senior year of high school, some family friends gave me a very broken electric guitar. The headstock was cracked clean in half. The pickguard was shattered and dirty. And it didn’t make any noise at all.</p>",
+        "<p>Upon further research, it was briefly made sometime in the 1960s by a now-defunct company, and had no documentation whatsoever. It really seemed like a lost cause. I took off the pickguard and cleaned everything up; after spending increasingly long hours admiring its components, I figured I might as well just fix it.</p>"
       ]
     },
     {
-      "heading": "First method: NLLS",
+      "heading": "Wiring",
       "paragraphs": [
-        "<p>My lab uses NLLS (Non Linear Least Squares) algorithms to actually find the geographic point that best satisfies all the TDOA measurements (which have inherent error). In principle, this can be extended to three dimensions.</p>",
-        "<p>I set up a simulation: given the locations of four closely situated nodes in Poland, and a theoretical jammer position I chose, I manually calculated the TDOA between each node pair and fed that into a modified NLLS algorithm to return a 3d position. As expected, the perfect TDOAs led to very accurate results; the algorithm very nearly found the jammer point I was simulating even for extremely high heights (0.1 - 50,000 meters above WGS84 ellipsoid).</p>",
-        "<p>This method started to fall apart once I injected random clock jitter error into the TDOA times I fed the NLLS. This, coupled with the fact that all the simulated nodes must be on the ground and thus have very poor vertical discretion (VDOP) quickly showed why this method doesn’t work as well for space-based jamming.</p>"
+        "<p>I spent lots of hours fiddling with different configurations of the tone circuitry. With an MP3 player hooked up to where the pickups should be, I was able to play with various filter and volume knob configurations. I decided on buying an “orange drop” low-pass filter. The original potentiometers turned out to be functional after some internal cleaning.</p>"
       ]
     },
     {
-      "heading": "Second method: Catalog-based, ephemeris data TDOA matching",
+      "heading": "Pickguard",
       "paragraphs": [
-        "<p>This method involves using broadcast ephemerides; if I know the position of every satellite at the moment the jamming happened, I can calculate a theoretical TDOA for each node-pair, for each satellite visible to the nodes in the sky, and see which set of theoretical TDOAs best matches those which were actually observed from the ground.</p>",
-        "<p>Using this method on actual clean GPS-band data from our nodes, I was able to pick a satellite visible to all nodes, calculate the TDOA of its PRN code as observed by the real nodes, and use that as the ‘observed TDOA’. Then, by calculating a theoretical set of TDOA pairs for each satellite from its known position (from the ephemerides), I verified that each satellite ranked as the most likely matched candidate for the TDOAs taken from its own PRN code.</p>",
-        "<p>Please note that I had assistance from AI in creating/modifying these algorithms.</p>",
-        "<p>There are also obvious limitations to this ephemerides-based approach; <strong>see the slide deck below for more info</strong>.</p>"
-      ]
-    }
-  ],
-  "vex-code": [
-    {
-      "heading": "",
-      "paragraphs": [
-        "<p>This is the code I developed for my VEX VRC robotics team during the 2023-2024 VEX game, “Over Under”. <strong>Source code avaliable on GitHub.</strong></p>"
+        "<p>(The pickguard is the name for the plastic plate that protects the wood face of the guitar). I thought I was done with the guitar after I’d redone the wiring; I put a bit of superglue on the original pickguard and called it good. It only took one jam session to re-break it by pulling instrument cable out at a funny angle.</p>",
+        "<p>I took off the broken pickguard, put it together one last time, and put it through my school’s industrial photocopier. After using Fusion 360 to trace and scale it, I laser cut a new one out of clear acrylic and used a dremel to scuff some pretty patterns into it. Having a clear pickguard is unusual, and leads to some interesting possibilities…</p>"
       ]
     },
     {
-      "heading": "Autonomous recorder",
+      "heading": "Lighting",
       "paragraphs": [
-        "<p>Stores the position of the left joystick, right joystick, and intake/outtake button to the SD card every 20ms; allows the user to select a recording to play back. That way, our team’s driver could record himself actually driving for 15 seconds, and we could replay the recording during the autonomous period of real competitions.</p>"
-      ]
-    },
-    {
-      "heading": "Autonomous code",
-      "paragraphs": [
-        "<p>Features:</p>",
-        "<ul><li>Simple PID function to smoothly drive a specified distance and avoid overshooting.</li><li>Function that uses feedback from gyroscope to rotate in place a specific number of degrees.</li><li>”Asymmetric driving” function to move the robot in a curve or spline: set chassis left and right side power independently.</li></ul>",
-        "<p><strong>Please note:</strong> I was in high school when I wrote this, so it’s not perfect. I cleaned up some comments and variable names in 2026, and fixed a couple of the obvious bugs, but there may be bugs I never caught!</p>"
+        "<p>I installed a strip of neopixels into the electronics cavity of the wood, and wired them to the D+, power, and ground of a USB-C port which I mounted in the pickguard. I chose to keep all circuitry out of the guitar; anytime I want to change the lighting control, I don’t need to take the guitar apart. The guitar simply houses the lights themselves and no more.</p>",
+        "<p>As for the external lighting controller: an Adafruit Feather M0 sends a lighting signal to a logic level shifter, which passes it on through the USB C cable. Instead of buying new parts, I reused a broken LG phone I had: the LG’s battery is perfect for powering the Neopixels for hours on end, and I repurposed the LG itself to charge its own old battery so I wouldn’t need to create a separate charging circuit.</p>",
+        "<p>Finally, I use the FastLED library to program whatever lighting effects I desire, and connect my phone to the Feather over Bluetooth to command it to switch between stored effects.</p>"
       ]
     }
   ]
